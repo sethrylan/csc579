@@ -7,8 +7,8 @@ import (
 	"log"
 	. "mm1k"
 	"os"
-	"strconv"
 	"sort"
+	"strconv"
 )
 
 var λ float64
@@ -80,10 +80,10 @@ func main() {
 	fmt.Printf("Average Service Time = %.2f\n", mean(completes, Service))
 	fmt.Printf("Average waiting time = %.2f\n", mean(completes, Wait))
 
-	sorted:= append(rejects, completes...)
+	sorted := append(rejects, completes...)
 	sort.Sort(ByID(sorted))
-	for _,c:= range sorted {
-		if (c.ID == L || c.ID == L+1 || c.ID == L +10 || c.ID == L+11) {
+	for _, c := range sorted {
+		if c.ID == L || c.ID == L+1 || c.ID == L+10 || c.ID == L+11 {
 			PrintCustomer(c)
 		}
 	}

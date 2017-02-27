@@ -40,7 +40,7 @@ func Run(arrivalDistribution Distribution, q Queue, serviceDistribution Distribu
 						Service:          serviceDistribution.Get(),
 						Departure:        t1,
 						QueueAtDeparture: q.Len(),
-						Position:					-1}
+						Position:         -1}
 				} else {
 					q.Enqueue(Customer{ID: id,
 						Arrival: t1,
@@ -53,7 +53,7 @@ func Run(arrivalDistribution Distribution, q Queue, serviceDistribution Distribu
 				}
 			} else { // If next arrival is after next completion -> Event: Departure
 				if !math.IsInf(t2, 1) { // if next completion exists
-					clock = t2 // Set time to time of next completion.
+					clock = t2                             // Set time to time of next completion.
 					customer := q.Dequeue()                // Remove customer from queue
 					customer.Departure = t2                // Set completion time
 					customer.QueueAtDeparture = q.Len()    // Set queue size
