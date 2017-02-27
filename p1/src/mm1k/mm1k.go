@@ -1,6 +1,8 @@
 package mm1k
 
 import (
+	"fmt"
+	"log"
 	"math"
 )
 
@@ -20,6 +22,31 @@ type Queue interface {
 	Len() int
 	NextCompletion() float64
 	Full() bool
+}
+
+// Your simulation program will terminate once C customers have completed
+// service, where C is an input parameter. For initial conditions, assume that
+// at time t = 0 the system is empty. Draw a random number to decide when the
+// first arrival will occur.
+func Simulate(λ float64, K int, C int, seed int64) (completes []Customer, rejects []Customer) {
+	var customer Customer
+	var rejected, completed <-chan Customer
+	rejected, completed = Run(
+		NewExpDistribution(λ, seed),
+		NewFIFOQueue(K),
+		NewExpDistribution(λ, seed+1),
+	)
+	for len(completes) < C {
+		select {
+		case customer = <-rejected:
+			rejects = append(rejects, customer)
+			LogCustomer(customer)
+		case customer = <-completed:
+			completes = append(completes, customer)
+			LogCustomer(customer)
+		}
+	}
+	return
 }
 
 func Run(arrivalDistribution Distribution, q Queue, serviceDistribution Distribution) (rejects, completes <-chan Customer) {
@@ -68,4 +95,16 @@ func Run(arrivalDistribution Distribution, q Queue, serviceDistribution Distribu
 	rejects = rejected
 	completes = completed
 	return
+}
+
+// Print the arrival time, service time, time of departure of customers, as well
+// as the number of customers in the system immediately after the departure of
+// each of these customers
+func PrintCustomer(c Customer) {
+	fmt.Printf("Customer %d (%d) | ", c.ID, c.Position)
+	fmt.Printf("Arrival, Service, Departure = %.3f, %.3f, %.3f\n", c.Arrival, c.Service, c.Departure)
+}
+
+func LogCustomer(c Customer) {
+	log.Printf("Customer %02d (%02d) | Arrival, Service, Departure = %.3f, %.3f, %.3f\n", c.ID, c.Position, c.Arrival, c.Service, c.Departure)
 }

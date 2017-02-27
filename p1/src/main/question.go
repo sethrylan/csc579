@@ -48,3 +48,10 @@ type ByID []mm1k.Customer
 func (a ByID) Len() int           { return len(a) }
 func (a ByID) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByID) Less(i, j int) bool { return a[i].ID < a[j].ID }
+
+// Let the queue capacity K = 20. Plot the CLR against the value of ρ,
+// for ρ = 0.05 to ρ = 0.95, in increments of 0.10. Submit two graphs: one for
+// C = 1000 and one for C = 100000.
+func Question1() {
+
+}
