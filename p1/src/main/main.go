@@ -8,6 +8,7 @@ import (
 	. "mm1k"
 	"os"
 	"strconv"
+	"sort"
 )
 
 var λ float64
@@ -67,10 +68,10 @@ func main() {
 		select {
 		case customer = <-rejected:
 			rejects = append(rejects, customer)
-			LogCustomer("rejected ", customer)
+			LogCustomer(customer)
 		case customer = <-completed:
 			completes = append(completes, customer)
-			LogCustomer("", customer)
+			LogCustomer(customer)
 		}
 	}
 
@@ -79,18 +80,24 @@ func main() {
 	fmt.Printf("Average Service Time = %.2f\n", mean(completes, Service))
 	fmt.Printf("Average waiting time = %.2f\n", mean(completes, Wait))
 
+	sorted:= append(rejects, completes...)
+	sort.Sort(ByID(sorted))
+	for _,c:= range sorted {
+		if (c.ID == L || c.ID == L+1 || c.ID == L +10 || c.ID == L+11) {
+			PrintCustomer(c)
+		}
+	}
 	// L, L + 1, L + 10, and L + 11
 }
 
 // Print the arrival time, service time, time of departure of customers, as well
 // as the number of customers in the system immediately after the departure of
 // each of these customers
-func PrintCustomer(msg string, c Customer) {
-	log.Printf("Customer %d (%d) %s\n", c.ID, c.Position, msg)
-	log.Printf("Arrival, Service, Departure = %.3f, %.3f, %.3f\n", c.Arrival, c.Service, c.Departure)
+func PrintCustomer(c Customer) {
+	fmt.Printf("Customer %d (%d) | ", c.ID, c.Position)
+	fmt.Printf("Arrival, Service, Departure = %.3f, %.3f, %.3f\n", c.Arrival, c.Service, c.Departure)
 }
 
-func LogCustomer(msg string, c Customer) {
-	log.Printf("Customer %d (%d) %s\n", c.ID, c.Position, msg)
-	log.Printf("Arrival, Service, Departure = %.3f, %.3f, %.3f\n", c.Arrival, c.Service, c.Departure)
+func LogCustomer(c Customer) {
+	log.Printf("Customer %02d (%02d) | Arrival, Service, Departure = %.3f, %.3f, %.3f\n", c.ID, c.Position, c.Arrival, c.Service, c.Departure)
 }

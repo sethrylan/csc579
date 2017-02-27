@@ -39,7 +39,8 @@ func Run(arrivalDistribution Distribution, q Queue, serviceDistribution Distribu
 						Arrival:          t1,
 						Service:          serviceDistribution.Get(),
 						Departure:        t1,
-						QueueAtDeparture: q.Len()}
+						QueueAtDeparture: q.Len(),
+						Position:					-1}
 				} else {
 					q.Enqueue(Customer{ID: id,
 						Arrival: t1,
