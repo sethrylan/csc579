@@ -59,12 +59,12 @@ func Question1(seed int64) {
 	for _, C := range []int{1000, 100000} {
 		for ρ := 0.05; ρ <= 0.95; ρ += 0.10 {
 			fmt.Printf("%f, %d, %d | ", ρ, K, C)
-			completes, rejects := Simulate(ρ, K, C, seed)
+			completes, rejects := Simulate(ρ, 1.0, K, C, seed)
 			sorted := append(rejects, completes...)
 			totalEvents := sorted[len(sorted)-1].ID + 1
 			sort.Sort(ByID(sorted))
 			// fmt.Printf("X/N = %d/%d\n", len(rejects), sorted[len(sorted)-1].ID+1)
-			fmt.Printf("CLR (Empirical) = %.3f\n", EmpiricalCLR(len(rejects), totalEvents))
+			fmt.Printf("CLR (Empirical) = %.4f\n", EmpiricalCLR(len(rejects), totalEvents))
 		}
 	}
 }
@@ -77,11 +77,11 @@ func Question2(seed int64) {
 	for _, C := range []int{1000, 100000} {
 		for K := 10; K <= 100; K += 10 {
 			fmt.Printf("%f, %d, %d | ", ρ, K, C)
-			completes, rejects := Simulate(ρ, K, C, seed)
+			completes, rejects := Simulate(ρ, 1.0, K, C, seed)
 			sorted := append(rejects, completes...)
 			totalEvents := sorted[len(sorted)-1].ID + 1
 			sort.Sort(ByID(sorted))
-			fmt.Printf("CLR (Empirical) = %.3f\n", EmpiricalCLR(len(rejects), totalEvents))
+			fmt.Printf("CLR (Empirical) = %.4f\n", EmpiricalCLR(len(rejects), totalEvents))
 		}
 	}
 }
@@ -93,11 +93,11 @@ func Question3(seed int64) {
 	C := 100000
 	for ρ := 0.05; ρ <= 0.95; ρ += 0.10 {
 		fmt.Printf("%f, %d, %d | ", ρ, K, C)
-		completes, rejects := Simulate(ρ, K, C, seed)
+		completes, rejects := Simulate(ρ, 1.0, K, C, seed)
 		sorted := append(rejects, completes...)
 		totalEvents := sorted[len(sorted)-1].ID + 1
 		sort.Sort(ByID(sorted))
-		fmt.Printf("CLR (Empirical, Analytical) =  (%.3f, %.3f\n",
+		fmt.Printf("CLR (Empirical, Analytical) =  (%.4f, %.4f\n",
 			EmpiricalCLR(len(rejects), totalEvents),
 			AnalyticalCLR(ρ, K))
 	}
@@ -112,10 +112,10 @@ func Question4(seed int64) {
 	C := 100000
 	for ρ := 0.05; ρ <= 0.95; ρ += 0.10 {
 		fmt.Printf("%f, %d, %d | ", ρ, K, C)
-		completes, rejects := Simulate(ρ, K, C, seed)
+		completes, rejects := Simulate(ρ, 1.0, K, C, seed)
 		sorted := append(rejects, completes...)
 		sort.Sort(ByID(sorted))
-		fmt.Printf("W̄ = %.3f\n", Mean(completes, Service))
+		fmt.Printf("W̄ = %.4f\n", Mean(completes, Service))
 	}
 }
 
@@ -128,7 +128,7 @@ func Question5(seed int64) {
 	for ρ := 0.05; ρ <= 0.95; ρ += 0.10 {
 		func() {
 			defer timeTrack(time.Now(), fmt.Sprintf("\nρ = %.2f", ρ))
-			Simulate(ρ, K, C, seed)
+			Simulate(ρ, 1.0, K, C, seed)
 		}()
 	}
 	fmt.Printf("\n")

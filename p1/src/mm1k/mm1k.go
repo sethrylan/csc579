@@ -28,13 +28,13 @@ type Queue interface {
 // service, where C is an input parameter. For initial conditions, assume that
 // at time t = 0 the system is empty. Draw a random number to decide when the
 // first arrival will occur.
-func Simulate(λ float64, K int, C int, seed int64) (completes []Customer, rejects []Customer) {
+func Simulate(λ float64, µ float64, K int, C int, seed int64) (completes []Customer, rejects []Customer) {
 	var customer Customer
 	var rejected, completed <-chan Customer
 	rejected, completed = Run(
 		NewExpDistribution(λ, seed),
 		NewFIFOQueue(K),
-		NewExpDistribution(1, seed+1),
+		NewExpDistribution(µ, seed+1),
 	)
 	for len(completes) < C {
 		select {
