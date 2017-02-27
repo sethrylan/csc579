@@ -10,9 +10,18 @@ import (
 // ∴ µ = 1
 // ∴ ρ = λ
 // CLR = ((1-ρ)*ρ^K)/(1-ρ^(K+1))
-func CLR(ρ float64, K int) float64 {
+func AnalyticalCLR(ρ float64, K int) float64 {
 	k := float64(K)
 	return ((1 - ρ) * math.Pow(ρ, k)) / (1 - math.Pow(ρ, (k+1)))
+}
+
+// Let N be the total number of customers that arrived to the system at the time
+// the simulation ends (i.e., after the C-th customer completes service, C ≤ N).
+// Let X be the number of customers denied service (lost) at the time the
+// simulation ends. Let us define the customer loss rate (CLR) as:
+// CLR = X/N
+func EmpiricalCLR(x int, n int) float64 {
+	return float64(x) / float64(n)
 }
 
 type field func(c mm1k.Customer) float64

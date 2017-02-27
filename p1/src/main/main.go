@@ -50,6 +50,7 @@ func main() {
 	fmt.Printf("K =    %d\n", K)
 	fmt.Printf("C =    %d\n", C)
 	fmt.Printf("L =    %d\n", L)
+	fmt.Printf("µ =    1\n")
 
 	// Your simulation program will terminate once C customers have completed
 	// service, where C is an input parameter. For initial conditions, assume that
@@ -75,13 +76,15 @@ func main() {
 		}
 	}
 
+	sorted := append(rejects, completes...)
+	sort.Sort(ByID(sorted))
+
 	fmt.Printf("Master clock =         %.2f\n", customer.Departure)
-	fmt.Printf("CLR =                  %.2f\n", CLR(λ, K))
+	fmt.Printf("CLR (Analytical) =     %.2f\n", AnalyticalCLR(λ, K))
+	fmt.Printf("CLR (Empirical) =      %.2f\n", EmpiricalCLR(len(rejects), sorted[len(sorted)-1].ID))
 	fmt.Printf("Average Service Time = %.2f\n", mean(completes, Service))
 	fmt.Printf("Average waiting time = %.2f\n", mean(completes, Wait))
 
-	sorted := append(rejects, completes...)
-	sort.Sort(ByID(sorted))
 	for _, c := range sorted {
 		if c.ID == L || c.ID == L+1 || c.ID == L+10 || c.ID == L+11 {
 			PrintCustomer(c)
