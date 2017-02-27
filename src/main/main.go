@@ -54,14 +54,14 @@ func main() {
 	// parameter. For initial conditions, assume that at time t = 0 the system is empty. Draw a random number
 	// to decide when the first arrival will occur, and then start your simulation by locating the first event, etc., as
 	// we discussed in class.
+	var serviced int = 0
+	var cus Customer
 	var rejected, completed <-chan Customer
 	rejected, completed = Run(
 		NewExpDistribution(λ, seed),
 		NewFIFOQueue(K),
 		NewExpDistribution(λ, seed+1),
 	)
-	var cus Customer
-	serviced := 0
 	for serviced < C {
 		select {
 		case cus = <-rejected:

@@ -63,14 +63,6 @@ func (q *FIFOQueue) Enqueue(customer Customer) (cus Customer) {
 	return customer
 }
 
-// Returns the next available time that the queue/server can accept a new arrival
-func (q *FIFOQueue) Next() (next float64) {
-	for _, e := range q.a {
-		next = math.Max(next+e.Service, e.Arrival+e.Service)
-	}
-	return
-}
-
 func (q *FIFOQueue) NextCompletion() (next float64) {
 	if q.Len() > 0 {
 		next = q.peek().Start + q.peek().Service
