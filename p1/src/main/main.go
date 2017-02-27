@@ -67,10 +67,10 @@ func main() {
 		select {
 		case customer = <-rejected:
 			rejects = append(rejects, customer)
-			PrintCustomer("rejected ", customer)
+			LogCustomer("rejected ", customer)
 		case customer = <-completed:
 			completes = append(completes, customer)
-			PrintCustomer("", customer)
+			LogCustomer("", customer)
 		}
 	}
 
@@ -82,21 +82,15 @@ func main() {
 	// L, L + 1, L + 10, and L + 11
 }
 
-// func PrintCustomer(msg string, c Customer) {
-// 	log.Printf("%sCustomer %d (%d)\n", msg, c.ID, c.Position)
-// 	log.Printf("Arrival=%f\n", c.Arrival)
-// 	log.Printf("Service=%f\n", c.Service)
-// 	log.Printf("Start=%f\n", c.Start)
-// 	log.Printf("Departure=%f\n", c.Departure)
-// }
-
 // Print the arrival time, service time, time of departure of customers, as well
 // as the number of customers in the system immediately after the departure of
 // each of these customers
 func PrintCustomer(msg string, c Customer) {
-	log.Printf("Customer %d %s (%d)\n", c.ID, msg, c.Position)
-	log.Printf("Arrival =   %.3f\n", c.Arrival)
-	log.Printf("Service =   %.3f\n", c.Service)
-	log.Printf("Start =     %.3f\n", c.Start)
-	log.Printf("Departure = %.3f\n", c.Departure)
+	log.Printf("Customer %d (%d) %s\n", c.ID, c.Position, msg)
+	log.Printf("Arrival, Service, Departure = %.3f, %.3f, %.3f\n", c.Arrival, c.Service, c.Departure)
+}
+
+func LogCustomer(msg string, c Customer) {
+	log.Printf("Customer %d (%d) %s\n", c.ID, c.Position, msg)
+	log.Printf("Arrival, Service, Departure = %.3f, %.3f, %.3f\n", c.Arrival, c.Service, c.Departure)
 }
