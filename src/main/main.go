@@ -1,17 +1,18 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	"io/ioutil"
+	"log"
+	. "mm1k"
 	"os"
 	"strconv"
-	"log"
-	"io/ioutil"
-	"flag"
-	. "mm1k"
 )
 
 var λ float64
 var K, C, L int
+
 const seed int64 = 42
 
 const usageMsg string = "λ K C L\n" +
@@ -37,7 +38,7 @@ func init() {
 	L, _ = strconv.Atoi(args[3])
 
 	log.SetFlags(log.Lshortfile)
-	if (*debugPtr) {
+	if *debugPtr {
 		log.SetOutput(ioutil.Discard)
 	}
 }
@@ -55,20 +56,20 @@ func main() {
 	// we discussed in class.
 	var rejected, completed <-chan Customer
 	rejected, completed = Run(
-	    NewExpDistribution(λ, seed),
-	    NewFIFOQueue(K),
-	    NewExpDistribution(λ, seed + 1),
+		NewExpDistribution(λ, seed),
+		NewFIFOQueue(K),
+		NewExpDistribution(λ, seed+1),
 	)
 	var cus Customer
 	serviced := 0
 	for serviced < C {
-	    select {
-		    case cus = <-rejected:
-		        PrintCustomer("rejected ", cus)
-		    case cus = <-completed:
-		    		serviced += 1
-		        PrintCustomer("", cus)
-	    }
+		select {
+		case cus = <-rejected:
+			PrintCustomer("rejected ", cus)
+		case cus = <-completed:
+			serviced += 1
+			PrintCustomer("", cus)
+		}
 	}
 
 	fmt.Printf("Master clock = TODO\n")
