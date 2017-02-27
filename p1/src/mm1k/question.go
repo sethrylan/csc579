@@ -1,8 +1,7 @@
-package main
+package mm1k
 
 import (
 	"math"
-	"mm1k"
 )
 
 // Returns the Customer Loss Rate as a function of ρ and K
@@ -24,17 +23,17 @@ func EmpiricalCLR(x int, n int) float64 {
 	return float64(x) / float64(n)
 }
 
-type field func(c mm1k.Customer) float64
+type field func(c Customer) float64
 
-func Service(c mm1k.Customer) float64 {
+func Service(c Customer) float64 {
 	return c.Service
 }
 
-func Wait(c mm1k.Customer) float64 {
+func Wait(c Customer) float64 {
 	return c.Departure - c.Arrival
 }
 
-func mean(customers []mm1k.Customer, fn field) float64 {
+func Mean(customers []Customer, fn field) float64 {
 	total := 0.0
 	for _, c := range customers {
 		total += fn(c)
@@ -43,7 +42,7 @@ func mean(customers []mm1k.Customer, fn field) float64 {
 }
 
 // ByID implements sort.Interface for []Customer
-type ByID []mm1k.Customer
+type ByID []Customer
 
 func (a ByID) Len() int           { return len(a) }
 func (a ByID) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
@@ -52,6 +51,11 @@ func (a ByID) Less(i, j int) bool { return a[i].ID < a[j].ID }
 // Let the queue capacity K = 20. Plot the CLR against the value of ρ,
 // for ρ = 0.05 to ρ = 0.95, in increments of 0.10. Submit two graphs: one for
 // C = 1000 and one for C = 100000.
-func Question1() {
-
+func Question1(seed int64) {
+	K := 20
+	for C := range []int{1000, 100000} {
+		for ρ := 0.05; ρ <= 0.95; ρ+=0.10 {
+			Simulate(ρ, K, C, seed)
+		}
+	}
 }

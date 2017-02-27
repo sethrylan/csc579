@@ -59,8 +59,8 @@ func main() {
 	fmt.Printf("Master clock =         %.2f\n", completes[len(completes)-1].Departure)
 	fmt.Printf("CLR (Analytical) =     %.2f\n", AnalyticalCLR(λ, K))
 	fmt.Printf("CLR (Empirical) =      %.2f\n", EmpiricalCLR(len(rejects), sorted[len(sorted)-1].ID))
-	fmt.Printf("Average Service Time = %.2f\n", mean(completes, Service))
-	fmt.Printf("Average waiting time = %.2f\n", mean(completes, Wait))
+	fmt.Printf("Average Service Time = %.2f\n", Mean(completes, Service))
+	fmt.Printf("Average waiting time = %.2f\n", Mean(completes, Wait))
 
 	for _, c := range sorted {
 		// L, L + 1, L + 10, and L + 11
