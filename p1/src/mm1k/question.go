@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"sort"
+	"time"
 )
 
 // Returns the Customer Loss Rate as a function of ρ and K
@@ -61,7 +62,7 @@ func Question1(seed int64) {
 			completes, rejects := Simulate(ρ, K, C, seed)
 			sorted := append(rejects, completes...)
 			sort.Sort(ByID(sorted))
-			fmt.Printf("CLR (Empirical) = %f\n", EmpiricalCLR(len(rejects), sorted[len(sorted)-1].ID))
+			fmt.Printf("CLR (Empirical) = %.3f\n", EmpiricalCLR(len(rejects), sorted[len(sorted)-1].ID))
 		}
 	}
 }
@@ -77,7 +78,59 @@ func Question2(seed int64) {
 			completes, rejects := Simulate(ρ, K, C, seed)
 			sorted := append(rejects, completes...)
 			sort.Sort(ByID(sorted))
-			fmt.Printf("CLR (Empirical) = %f\n", EmpiricalCLR(len(rejects), sorted[len(sorted)-1].ID))
+			fmt.Printf("CLR (Empirical) = %.3f\n", EmpiricalCLR(len(rejects), sorted[len(sorted)-1].ID))
 		}
 	}
+}
+
+// Let K = 20. For C = 100000 and for ρ = 0.05 to 0.95 (in increments of 0.10),
+// plot the simulation and analytical values of CLR on the same graph.
+func Question3(seed int64) {
+	K := 20
+	C := 100000
+	for ρ := 0.05; ρ <= 0.95; ρ += 0.10 {
+		fmt.Printf("%f, %d, %d | ", ρ, K, C)
+		completes, rejects := Simulate(ρ, K, C, seed)
+		sorted := append(rejects, completes...)
+		sort.Sort(ByID(sorted))
+		fmt.Printf("CLR (Empirical, Analytical) =  (%.3f, %.3f\n",
+			EmpiricalCLR(len(rejects), sorted[len(sorted)-1].ID),
+			AnalyticalCLR(ρ, K))
+	}
+}
+
+// Let us set K = 100 and C = 100000. Compute the average waiting time W of the
+// C customers that have received service at the end of the simulation (i.e.,
+// ignore any lost customers or customers waiting in the queue when the
+// simulation ends). Plot W against the value of ρ for ρ = 0.05 to 0.95.
+func Question4(seed int64) {
+	K := 100
+	C := 100000
+	for ρ := 0.05; ρ <= 0.95; ρ += 0.10 {
+		fmt.Printf("%f, %d, %d | ", ρ, K, C)
+		completes, rejects := Simulate(ρ, K, C, seed)
+		sorted := append(rejects, completes...)
+		sort.Sort(ByID(sorted))
+		fmt.Printf("W̄ = %.3f\n", Mean(completes, Service))
+	}
+}
+
+// Let us again set K = 40 and C = 100000. Time the running time of your
+// simulation for ρ = 0.05 to 0.95. Plot the running time against the value of
+// ρ. Note: turn off I/O
+func Question5(seed int64) {
+	K := 40
+	C := 100000
+	for ρ := 0.05; ρ <= 0.95; ρ += 0.10 {
+		func() {
+			defer timeTrack(time.Now(), fmt.Sprintf("\nρ = %.2f", ρ))
+			Simulate(ρ, K, C, seed)
+		}()
+	}
+	fmt.Printf("\n")
+}
+
+func timeTrack(start time.Time, name string) {
+	elapsed := time.Since(start)
+	fmt.Printf("%s took %s", name, elapsed)
 }
