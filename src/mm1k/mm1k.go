@@ -6,12 +6,12 @@ import (
 )
 
 type Customer struct {
-	ID         int
-	Arrival    float64 // time of arrival of the customer
-	Service    float64
-	Start      float64 // start time of service of the customer
-	Completion float64 // time of completion/departure of the customer
-	Position   int     // identifier of the seat that sits the waiting customer
+	ID        int
+	Arrival   float64 // time of arrival of the customer
+	Service   float64
+	Start     float64 // start time of service of the customer
+	Departure float64 // time of completion/departure of the customer
+	Position  int     // identifier of the seat that sits the waiting customer
 }
 
 type Queue interface {
@@ -51,7 +51,7 @@ func Run(arrivalDistribution Distribution, q Queue, serviceDistribution Distribu
 					log.Printf("t1() == %f\n", t1)
 					log.Printf("t2() == %f\n", t2)
 					customer := q.Dequeue()                // Remove customer from queue
-					customer.Completion = t2               // Set completion time
+					customer.Departure = t2                // Set completion time
 					customer.Start = t2 - customer.Service // and start time
 					completed <- customer                  // and add the customer to the completed channel
 				}

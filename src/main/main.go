@@ -45,37 +45,38 @@ func init() {
 
 func main() {
 
-	fmt.Printf("λ = %.3f\n", λ)
-	fmt.Printf("K = %d\n", K)
-	fmt.Printf("C = %d\n", C)
-	fmt.Printf("L = %d\n", L)
+	fmt.Printf("λ =    %.3f\n", λ)
+	fmt.Printf("K =    %d\n", K)
+	fmt.Printf("C =    %d\n", C)
+	fmt.Printf("L =    %d\n", L)
 
 	// Your simulation program will terminate once C customers have completed service, where C is an input
 	// parameter. For initial conditions, assume that at time t = 0 the system is empty. Draw a random number
 	// to decide when the first arrival will occur, and then start your simulation by locating the first event, etc., as
 	// we discussed in class.
-	var serviced int = 0
 	var customer Customer
 	var rejected, completed <-chan Customer
+	var rejects, completes []Customer
 	rejected, completed = Run(
 		NewExpDistribution(λ, seed),
 		NewFIFOQueue(K),
 		NewExpDistribution(λ, seed+1),
 	)
-	for serviced < C {
+	for len(completes) < C {
 		select {
 		case customer = <-rejected:
+			rejects = append(rejects, customer)
 			PrintCustomer("rejected ", customer)
 		case customer = <-completed:
-			serviced += 1
+			completes = append(completes, customer)
 			PrintCustomer("", customer)
 		}
 	}
 
-	fmt.Printf("Master clock = %.2f\n", customer.Completion)
-	fmt.Printf("CLR = TODO\n")
-	fmt.Printf("Average Service Time = TODO\n")
-	fmt.Printf("Average waiting time = TODO\n")
+	fmt.Printf("Master clock =         %.2f\n", customer.Departure)
+	fmt.Printf("CLR =                  %.2f\n", CLR(λ, K))
+	fmt.Printf("Average Service Time = %.2f\n", mean(completes, Service))
+	fmt.Printf("Average waiting time = %.2f\n", mean(completes, Wait))
 
 	// the arrival time, service time, time of departure of customers L, L + 1, L + 10, and L + 11, as well as
 	// the number of customers in the system immediately after the departure of each of these customers; if
@@ -88,5 +89,5 @@ func PrintCustomer(msg string, c Customer) {
 	log.Printf("Arrival=%f\n", c.Arrival)
 	log.Printf("Service=%f\n", c.Service)
 	log.Printf("Start=%f\n", c.Start)
-	log.Printf("Completion=%f\n", c.Completion)
+	log.Printf("Departure=%f\n", c.Departure)
 }
