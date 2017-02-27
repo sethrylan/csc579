@@ -1,7 +1,9 @@
 package mm1k
 
 import (
+	"fmt"
 	"math"
+	"sort"
 )
 
 // Returns the Customer Loss Rate as a function of ρ and K
@@ -53,9 +55,29 @@ func (a ByID) Less(i, j int) bool { return a[i].ID < a[j].ID }
 // C = 1000 and one for C = 100000.
 func Question1(seed int64) {
 	K := 20
-	for C := range []int{1000, 100000} {
-		for ρ := 0.05; ρ <= 0.95; ρ+=0.10 {
-			Simulate(ρ, K, C, seed)
+	for _, C := range []int{1000, 100000} {
+		for ρ := 0.05; ρ <= 0.95; ρ += 0.10 {
+			fmt.Printf("%f, %d, %d | ", ρ, K, C)
+			completes, rejects := Simulate(ρ, K, C, seed)
+			sorted := append(rejects, completes...)
+			sort.Sort(ByID(sorted))
+			fmt.Printf("CLR (Empirical) = %f\n", EmpiricalCLR(len(rejects), sorted[len(sorted)-1].ID))
+		}
+	}
+}
+
+// Now let us fix ρ = 0.85. Plot the CLR against the value of the queue
+// capacity K, as K increases from 10 to 100 in increments of 10. Again, submit
+// two graphs: one for C = 1000 and one for C = 100000.
+func Question2(seed int64) {
+	ρ := 0.85
+	for _, C := range []int{1000, 100000} {
+		for K := 10; K <= 100; K += 10 {
+			fmt.Printf("%f, %d, %d | ", ρ, K, C)
+			completes, rejects := Simulate(ρ, K, C, seed)
+			sorted := append(rejects, completes...)
+			sort.Sort(ByID(sorted))
+			fmt.Printf("CLR (Empirical) = %f\n", EmpiricalCLR(len(rejects), sorted[len(sorted)-1].ID))
 		}
 	}
 }

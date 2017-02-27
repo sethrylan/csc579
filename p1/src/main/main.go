@@ -68,4 +68,6 @@ func main() {
 			PrintCustomer(c)
 		}
 	}
+
+	Question2(seed)
 }
