@@ -34,7 +34,7 @@ func Simulate(λ float64, K int, C int, seed int64) (completes []Customer, rejec
 	rejected, completed = Run(
 		NewExpDistribution(λ, seed),
 		NewFIFOQueue(K),
-		NewExpDistribution(λ, seed+1),
+		NewExpDistribution(1, seed+1),
 	)
 	for len(completes) < C {
 		select {
