@@ -50,10 +50,11 @@ func main() {
 	fmt.Printf("C =    %d\n", C)
 	fmt.Printf("L =    %d\n", L)
 
-	// Your simulation program will terminate once C customers have completed service, where C is an input
-	// parameter. For initial conditions, assume that at time t = 0 the system is empty. Draw a random number
-	// to decide when the first arrival will occur, and then start your simulation by locating the first event, etc., as
-	// we discussed in class.
+	// Your simulation program will terminate once C customers have completed
+	// service, where C is an input parameter. For initial conditions, assume that
+	// at time t = 0 the system is empty. Draw a random number to decide when the
+	// first arrival will occur.
+
 	var customer Customer
 	var rejected, completed <-chan Customer
 	var rejects, completes []Customer
@@ -78,16 +79,24 @@ func main() {
 	fmt.Printf("Average Service Time = %.2f\n", mean(completes, Service))
 	fmt.Printf("Average waiting time = %.2f\n", mean(completes, Wait))
 
-	// the arrival time, service time, time of departure of customers L, L + 1, L + 10, and L + 11, as well as
-	// the number of customers in the system immediately after the departure of each of these customers; if
-	// any of these customers was not accepted for service (lost), set its departure time to its arrival time
-
+	// L, L + 1, L + 10, and L + 11
 }
 
+// func PrintCustomer(msg string, c Customer) {
+// 	log.Printf("%sCustomer %d (%d)\n", msg, c.ID, c.Position)
+// 	log.Printf("Arrival=%f\n", c.Arrival)
+// 	log.Printf("Service=%f\n", c.Service)
+// 	log.Printf("Start=%f\n", c.Start)
+// 	log.Printf("Departure=%f\n", c.Departure)
+// }
+
+// Print the arrival time, service time, time of departure of customers, as well
+// as the number of customers in the system immediately after the departure of
+// each of these customers
 func PrintCustomer(msg string, c Customer) {
-	log.Printf("%sCustomer %d (%d)\n", msg, c.ID, c.Position)
-	log.Printf("Arrival=%f\n", c.Arrival)
-	log.Printf("Service=%f\n", c.Service)
-	log.Printf("Start=%f\n", c.Start)
-	log.Printf("Departure=%f\n", c.Departure)
+	log.Printf("Customer %d %s (%d)\n", c.ID, msg, c.Position)
+	log.Printf("Arrival =   %.3f\n", c.Arrival)
+	log.Printf("Service =   %.3f\n", c.Service)
+	log.Printf("Start =     %.3f\n", c.Start)
+	log.Printf("Departure = %.3f\n", c.Departure)
 }
