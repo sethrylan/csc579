@@ -11,7 +11,7 @@ import (
 	"strconv"
 )
 
-var λ float64
+var λ, µ float64
 var K, C, L int
 
 const seed int64 = 42
@@ -37,6 +37,7 @@ func init() {
 	K, _ = strconv.Atoi(args[1])
 	C, _ = strconv.Atoi(args[2])
 	L, _ = strconv.Atoi(args[3])
+	µ = 1.0
 
 	log.SetFlags(log.Lshortfile)
 	if *debugPtr {
@@ -48,12 +49,12 @@ func init() {
 
 func main() {
 	fmt.Printf("λ =    %.3f\n", λ)
+	fmt.Printf("µ =    %.3f\n", µ)
 	fmt.Printf("K =    %d\n", K)
 	fmt.Printf("C =    %d\n", C)
 	fmt.Printf("L =    %d\n", L)
-	fmt.Printf("µ =    1\n")
 
-	completes, rejects := Simulate(λ, K, C, seed)
+	completes, rejects := Simulate(λ, µ, K, C, seed)
 
 	sorted := append(rejects, completes...)
 	sort.Sort(ByID(sorted))
@@ -72,5 +73,5 @@ func main() {
 		}
 	}
 
-	Question1(seed)
+	Question4(seed)
 }
