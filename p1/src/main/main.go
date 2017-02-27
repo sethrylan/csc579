@@ -39,7 +39,9 @@ func init() {
 	L, _ = strconv.Atoi(args[3])
 
 	log.SetFlags(log.Lshortfile)
-	if !*debugPtr {
+	if *debugPtr {
+		log.SetOutput(os.Stdout)
+	} else {
 		log.SetOutput(ioutil.Discard)
 	}
 }
@@ -57,11 +59,11 @@ func main() {
 	sort.Sort(ByID(sorted))
 	totalEvents := sorted[len(sorted)-1].ID + 1
 
-	fmt.Printf("Master clock =          %.2f\n", completes[len(completes)-1].Departure)
-	fmt.Printf("CLR (Analytical) =      %.2f\n", AnalyticalCLR(λ, K))
-	fmt.Printf("CLR (Empirical) =       %.2f\n", EmpiricalCLR(len(rejects), totalEvents))
-	fmt.Printf("Mean Service Time (S̄) = %.2f\n", Mean(completes, Service))
-	fmt.Printf("Mean Wait Time (W̄) =    %.2f\n", Mean(completes, Wait))
+	fmt.Printf("Master clock =                   %.3f\n", completes[len(completes)-1].Departure)
+	fmt.Printf("CLR (Analytical) =               %.3f\n", AnalyticalCLR(λ, K))
+	fmt.Printf("CLR (Empirical; X/N = %d/%d) =   %.3f\n", len(rejects), totalEvents, EmpiricalCLR(len(rejects), totalEvents))
+	fmt.Printf("Mean Service Time (S̄) =          %.3f\n", Mean(completes, Service))
+	fmt.Printf("Mean Wait Time (W̄) =             %.3f\n", Mean(completes, Wait))
 
 	for _, c := range sorted {
 		// L, L + 1, L + 10, and L + 11
