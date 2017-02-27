@@ -38,7 +38,7 @@ func init() {
 	L, _ = strconv.Atoi(args[3])
 
 	log.SetFlags(log.Lshortfile)
-	if *debugPtr {
+	if !*debugPtr {
 		log.SetOutput(ioutil.Discard)
 	}
 }
@@ -55,7 +55,7 @@ func main() {
 	// to decide when the first arrival will occur, and then start your simulation by locating the first event, etc., as
 	// we discussed in class.
 	var serviced int = 0
-	var cus Customer
+	var customer Customer
 	var rejected, completed <-chan Customer
 	rejected, completed = Run(
 		NewExpDistribution(λ, seed),
@@ -64,15 +64,15 @@ func main() {
 	)
 	for serviced < C {
 		select {
-		case cus = <-rejected:
-			PrintCustomer("rejected ", cus)
-		case cus = <-completed:
+		case customer = <-rejected:
+			PrintCustomer("rejected ", customer)
+		case customer = <-completed:
 			serviced += 1
-			PrintCustomer("", cus)
+			PrintCustomer("", customer)
 		}
 	}
 
-	fmt.Printf("Master clock = TODO\n")
+	fmt.Printf("Master clock = %.2f\n", customer.Completion)
 	fmt.Printf("CLR = TODO\n")
 	fmt.Printf("Average Service Time = TODO\n")
 	fmt.Printf("Average waiting time = TODO\n")
@@ -84,10 +84,9 @@ func main() {
 }
 
 func PrintCustomer(msg string, c Customer) {
-	fmt.Printf("%sCustomer %d (%d)\n", msg, c.ID, c.Position)
-	fmt.Printf("Arrival=%f\n", c.Arrival)
-	fmt.Printf("Service=%f\n", c.Service)
-	fmt.Printf("Start=%f\n", c.Start)
-	fmt.Printf("Completion=%f\n", c.Completion)
-
+	log.Printf("%sCustomer %d (%d)\n", msg, c.ID, c.Position)
+	log.Printf("Arrival=%f\n", c.Arrival)
+	log.Printf("Service=%f\n", c.Service)
+	log.Printf("Start=%f\n", c.Start)
+	log.Printf("Completion=%f\n", c.Completion)
 }
