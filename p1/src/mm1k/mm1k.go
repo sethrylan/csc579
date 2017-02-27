@@ -29,7 +29,7 @@ func Run(arrivalDistribution Distribution, q Queue, serviceDistribution Distribu
 
 	go func() {
 		var t1 float64 = arrivalDistribution.Get() // time of next arrival
-		var t2 float64 = math.Inf(1)               // time of next completion
+		var t2 float64 = math.Inf(1)               // time of next completion (∞ for no schedule Customer)
 		var id int                                 // Incremented Customer ID
 		for {                                      // Do forever
 			if t1 < t2 { // If next arrival is before next completion -> Event: Arrival
