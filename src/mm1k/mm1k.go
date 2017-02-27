@@ -35,7 +35,7 @@ func Run(arrivalDistribution Distribution, q Queue, serviceDistribution Distribu
 			if t1 < t2 { // If next arrival is before next completion -> Event: Arrival
 				clock = t1 // Set clock to time of next arrival.
 				if q.Full() {
-					rejected <- Customer{ID: id, Arrival: t1, Service: serviceDistribution.Get()}
+					rejected <- Customer{ID: id, Arrival: t1, Service: serviceDistribution.Get(), Departure: t1}
 				} else {
 					q.Enqueue(Customer{ID: id, Arrival: t1, Service: serviceDistribution.Get()})
 				}
