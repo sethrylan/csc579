@@ -61,8 +61,10 @@ func Question1(seed int64) {
 			fmt.Printf("%f, %d, %d | ", ρ, K, C)
 			completes, rejects := Simulate(ρ, K, C, seed)
 			sorted := append(rejects, completes...)
+			totalEvents := sorted[len(sorted)-1].ID + 1
 			sort.Sort(ByID(sorted))
-			fmt.Printf("CLR (Empirical) = %.3f\n", EmpiricalCLR(len(rejects), sorted[len(sorted)-1].ID))
+			// fmt.Printf("X/N = %d/%d\n", len(rejects), sorted[len(sorted)-1].ID+1)
+			fmt.Printf("CLR (Empirical) = %.3f\n", EmpiricalCLR(len(rejects), totalEvents))
 		}
 	}
 }
@@ -77,8 +79,9 @@ func Question2(seed int64) {
 			fmt.Printf("%f, %d, %d | ", ρ, K, C)
 			completes, rejects := Simulate(ρ, K, C, seed)
 			sorted := append(rejects, completes...)
+			totalEvents := sorted[len(sorted)-1].ID + 1
 			sort.Sort(ByID(sorted))
-			fmt.Printf("CLR (Empirical) = %.3f\n", EmpiricalCLR(len(rejects), sorted[len(sorted)-1].ID))
+			fmt.Printf("CLR (Empirical) = %.3f\n", EmpiricalCLR(len(rejects), totalEvents))
 		}
 	}
 }
@@ -92,9 +95,10 @@ func Question3(seed int64) {
 		fmt.Printf("%f, %d, %d | ", ρ, K, C)
 		completes, rejects := Simulate(ρ, K, C, seed)
 		sorted := append(rejects, completes...)
+		totalEvents := sorted[len(sorted)-1].ID + 1
 		sort.Sort(ByID(sorted))
 		fmt.Printf("CLR (Empirical, Analytical) =  (%.3f, %.3f\n",
-			EmpiricalCLR(len(rejects), sorted[len(sorted)-1].ID),
+			EmpiricalCLR(len(rejects), totalEvents),
 			AnalyticalCLR(ρ, K))
 	}
 }

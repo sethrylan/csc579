@@ -55,10 +55,11 @@ func main() {
 
 	sorted := append(rejects, completes...)
 	sort.Sort(ByID(sorted))
+	totalEvents := sorted[len(sorted)-1].ID + 1
 
 	fmt.Printf("Master clock =          %.2f\n", completes[len(completes)-1].Departure)
 	fmt.Printf("CLR (Analytical) =      %.2f\n", AnalyticalCLR(λ, K))
-	fmt.Printf("CLR (Empirical) =       %.2f\n", EmpiricalCLR(len(rejects), sorted[len(sorted)-1].ID))
+	fmt.Printf("CLR (Empirical) =       %.2f\n", EmpiricalCLR(len(rejects), totalEvents))
 	fmt.Printf("Mean Service Time (S̄) = %.2f\n", Mean(completes, Service))
 	fmt.Printf("Mean Wait Time (W̄) =    %.2f\n", Mean(completes, Wait))
 
@@ -69,5 +70,5 @@ func main() {
 		}
 	}
 
-	Question5(seed)
+	Question1(seed)
 }
