@@ -115,7 +115,7 @@ func Question4(seed int64) {
 		completes, rejects := Simulate(ρ, 1.0, K, C, seed)
 		sorted := append(rejects, completes...)
 		sort.Sort(ByID(sorted))
-		fmt.Printf("W̄ = %.4f\n", Mean(completes, Service))
+		fmt.Printf("W̄ = %.3f\n", Mean(completes, Wait))
 	}
 }
 
