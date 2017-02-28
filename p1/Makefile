@@ -30,4 +30,4 @@ vet:
 	go vet ./src/...
 
 tar:
-	tar czvf --exclude=".DS_Store" p1.tar.gz Makefile ./src ./test ./paper
+	tar czvf p1.tar.gz --exclude=".DS_Store" Makefile ./src ./test ./paper
