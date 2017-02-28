@@ -73,5 +73,5 @@ func main() {
 		}
 	}
 
-	Question4(seed)
+	// Question4(seed)
 }
