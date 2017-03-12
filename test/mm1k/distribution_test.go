@@ -1,4 +1,4 @@
-package mm1k
+package mm1k_test
 
 import (
 	"fmt"
@@ -7,27 +7,8 @@ import (
 )
 
 func TestExpDistribution(t *testing.T) {
-	// e := mm1k.NewExpDistribution(42, 0.5)
-	// for i := 0; i < 3; i++ {
-	//   fmt.Println(e.Get())
-	// }
-}
-
-func Example_expdev() {
-	for i := 0; i < 10; i++ {
-		fmt.Println(mm1k.Expdev(0.1))
-	}
-	// Output:
-	// 9.280098532639393
-	// 28.219317183488428
-	// 10.923123347724282
-	// 5.757449946389144
-	// 5.527549969524612
-	// 11.60986985737197
-	// 0.6789028586238292
-	// 1.7021820444431834
-	// 1.019989707799057
-	// 3.5797845111417415
+	e := mm1k.NewExpDistribution(0.5, 42)
+	e.Get()
 }
 
 func ExampleExpDistribution() {

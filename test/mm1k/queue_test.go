@@ -1,4 +1,4 @@
-package mm1k
+package mm1k_test
 
 import (
 	"fmt"
