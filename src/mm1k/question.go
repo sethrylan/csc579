@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-// Returns the Customer Loss Rate as a function of ρ and K
+// AnalyticalCLR returns the Customer Loss Rate as a function of ρ and K
 // ρ = λ/µ < 1
 // ∴ µ = 1
 // ∴ ρ = λ
@@ -17,6 +17,7 @@ func AnalyticalCLR(ρ float64, K int) float64 {
 	return ((1 - ρ) * math.Pow(ρ, k)) / (1 - math.Pow(ρ, (k+1)))
 }
 
+// EmpiricalCLR returns the Customer Loss Rate:
 // Let N be the total number of customers that arrived to the system at the time
 // the simulation ends (i.e., after the C-th customer completes service, C ≤ N).
 // Let X be the number of customers denied service (lost) at the time the
@@ -28,14 +29,17 @@ func EmpiricalCLR(x int, n int) float64 {
 
 type field func(c Customer) float64
 
+// Service is a field for sorting customer.
 func Service(c Customer) float64 {
 	return c.Service
 }
 
+// Wait is a field for sorting customer.
 func Wait(c Customer) float64 {
 	return c.Departure - c.Arrival
 }
 
+// Mean calculates the mean for field fn in a list of customers
 func Mean(customers []Customer, fn field) float64 {
 	total := 0.0
 	for _, c := range customers {
@@ -51,7 +55,7 @@ func (a ByID) Len() int           { return len(a) }
 func (a ByID) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByID) Less(i, j int) bool { return a[i].ID < a[j].ID }
 
-// Let the queue capacity K = 20. Plot the CLR against the value of ρ,
+// Question1 : Let the queue capacity K = 20. Plot the CLR against the value of ρ,
 // for ρ = 0.05 to ρ = 0.95, in increments of 0.10. Submit two graphs: one for
 // C = 1000 and one for C = 100000.
 func Question1(seed int64) {
@@ -69,7 +73,7 @@ func Question1(seed int64) {
 	}
 }
 
-// Now let us fix ρ = 0.85. Plot the CLR against the value of the queue
+// Question2 : Now let us fix ρ = 0.85. Plot the CLR against the value of the queue
 // capacity K, as K increases from 10 to 100 in increments of 10. Again, submit
 // two graphs: one for C = 1000 and one for C = 100000.
 func Question2(seed int64) {
@@ -86,7 +90,7 @@ func Question2(seed int64) {
 	}
 }
 
-// Let K = 20. For C = 100000 and for ρ = 0.05 to 0.95 (in increments of 0.10),
+// Question3 : Let K = 20. For C = 100000 and for ρ = 0.05 to 0.95 (in increments of 0.10),
 // plot the simulation and analytical values of CLR on the same graph.
 func Question3(seed int64) {
 	K := 20
@@ -103,7 +107,7 @@ func Question3(seed int64) {
 	}
 }
 
-// Let us set K = 100 and C = 100000. Compute the average waiting time W of the
+// Question4 : Let us set K = 100 and C = 100000. Compute the average waiting time W of the
 // C customers that have received service at the end of the simulation (i.e.,
 // ignore any lost customers or customers waiting in the queue when the
 // simulation ends). Plot W against the value of ρ for ρ = 0.05 to 0.95.
@@ -119,7 +123,7 @@ func Question4(seed int64) {
 	}
 }
 
-// Let us again set K = 40 and C = 100000. Time the running time of your
+// Question5 : Let us again set K = 40 and C = 100000. Time the running time of your
 // simulation for ρ = 0.05 to 0.95. Plot the running time against the value of
 // ρ. Note: turn off I/O
 func Question5(seed int64) {

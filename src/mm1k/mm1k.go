@@ -19,10 +19,19 @@ type Customer struct {
 
 // A Queue type defines the common operations for a service queue
 type Queue interface {
+	// Enqueue adds customer to the queue
 	Enqueue(customer Customer) Customer
+
+	// Dequeue removes and returns the next customer determined by the queue service discipline
 	Dequeue() Customer
+
+	// Len return the length of the queue
 	Len() int
+
+	// NextCompletion returns the time of next service completion, or +∞ if no next service
 	NextCompletion() float64
+
+	// Full returns true if queue is full
 	Full() bool
 }
 
