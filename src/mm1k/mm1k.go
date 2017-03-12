@@ -6,6 +6,7 @@ import (
 	"math"
 )
 
+// A Customer contains tracking and history for a customer
 type Customer struct {
 	ID               int     // montonically increasing identifier
 	Arrival          float64 // absolute time of arrival of the customer
@@ -16,6 +17,7 @@ type Customer struct {
 	QueueAtDeparture int     // number of customers in queue at time of departure
 }
 
+// A Queue type defines the common operations for a service queue
 type Queue interface {
 	Enqueue(customer Customer) Customer
 	Dequeue() Customer
@@ -24,8 +26,7 @@ type Queue interface {
 	Full() bool
 }
 
-// Your simulation program will terminate once C customers have completed
-// service, where C is an input parameter. For initial conditions, assume that
+// Simulate will terminate once C customers have completed. Assume that
 // at time t = 0 the system is empty. Draw a random number to decide when the
 // first arrival will occur.
 func Simulate(λ float64, µ float64, K int, C int, seed int64) (completes []Customer, rejects []Customer) {
@@ -40,23 +41,24 @@ func Simulate(λ float64, µ float64, K int, C int, seed int64) (completes []Cus
 		select {
 		case customer = <-rejected:
 			rejects = append(rejects, customer)
-			LogCustomer(customer)
+			logCustomer(customer)
 		case customer = <-completed:
 			completes = append(completes, customer)
-			LogCustomer(customer)
+			logCustomer(customer)
 		}
 	}
 	return
 }
 
+// Run will continually add and service customers using an event loop
 func Run(arrivalDistribution Distribution, q Queue, serviceDistribution Distribution) (rejects, completes <-chan Customer) {
 	rejected := make(chan Customer)  // Unbuffered channels ensure deterministic simulation
 	completed := make(chan Customer) //
 	var clock float64                // master clock
 
 	go func() {
-		var t1 float64 = arrivalDistribution.Get() // time of next arrival
-		var t2 float64 = math.Inf(1)               // time of next completion (∞ for no schedule Customer)
+		var t1 = arrivalDistribution.Get() // time of next arrival
+		var t2 = math.Inf(1)               // time of next completion (∞ for no schedule Customer)
 		var id int                                 // Incremented Customer ID
 		for {                                      // Do forever
 			if t1 < t2 { // If next arrival is before next completion -> Event: Arrival
@@ -73,7 +75,7 @@ func Run(arrivalDistribution Distribution, q Queue, serviceDistribution Distribu
 						Arrival: t1,
 						Service: serviceDistribution.Get()})
 				}
-				id += 1
+				id++
 				t1 = clock + arrivalDistribution.Get() // Set t1 to time of next arrival.
 				if q.Len() == 1 {                      // If queue is not empty
 					t2 = q.NextCompletion() // then set t2 to time of next completion.
@@ -97,14 +99,14 @@ func Run(arrivalDistribution Distribution, q Queue, serviceDistribution Distribu
 	return
 }
 
-// Print the arrival time, service time, time of departure of customers, as well
-// as the number of customers in the system immediately after the departure of
-// each of these customers
+// PrintCustomer prints "the arrival time, service time, time of departure of
+// customers, as well as the number of customers in the system immediately
+// after the departure of each of these customers"
 func PrintCustomer(c Customer) {
 	fmt.Printf("Customer %d (%d) | ", c.ID, c.Position)
 	fmt.Printf("Arrival, Service, Departure = %.3f, %.3f, %.3f\n", c.Arrival, c.Service, c.Departure)
 }
 
-func LogCustomer(c Customer) {
+func logCustomer(c Customer) {
 	log.Printf("Customer %02d (%02d) | Arrival, Service, Departure = %.3f, %.3f, %.3f\n", c.ID, c.Position, c.Arrival, c.Service, c.Departure)
 }
