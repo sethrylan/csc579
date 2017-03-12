@@ -12,7 +12,7 @@ import (
 )
 
 var λ, µ float64
-var K, C, L int
+var k, c, l int
 
 const seed int64 = 42
 
@@ -34,9 +34,9 @@ func init() {
 	args := flag.Args()
 
 	λ, _ = strconv.ParseFloat(args[0], 64)
-	K, _ = strconv.Atoi(args[1])
-	C, _ = strconv.Atoi(args[2])
-	L, _ = strconv.Atoi(args[3])
+	k, _ = strconv.Atoi(args[1])
+	c, _ = strconv.Atoi(args[2])
+	l, _ = strconv.Atoi(args[3])
 	µ = 1.0
 
 	log.SetFlags(log.Lshortfile)
@@ -50,26 +50,26 @@ func init() {
 func main() {
 	fmt.Printf("λ =    %.3f\n", λ)
 	fmt.Printf("µ =    %.3f\n", µ)
-	fmt.Printf("K =    %d\n", K)
-	fmt.Printf("C =    %d\n", C)
-	fmt.Printf("L =    %d\n", L)
+	fmt.Printf("K =    %d\n", k)
+	fmt.Printf("C =    %d\n", c)
+	fmt.Printf("L =    %d\n", l)
 
-	completes, rejects := mm1k.Simulate(λ, µ, K, C, seed)
+	completes, rejects := mm1k.Simulate(λ, µ, k, c, seed)
 
 	sorted := append(rejects, completes...)
 	sort.Sort(mm1k.ByID(sorted))
 	totalEvents := sorted[len(sorted)-1].ID + 1
 
 	fmt.Printf("Master clock =                   %.3f\n", completes[len(completes)-1].Departure)
-	fmt.Printf("CLR (Analytical) =               %.3f\n", mm1k.AnalyticalCLR(λ, K))
+	fmt.Printf("CLR (Analytical) =               %.3f\n", mm1k.AnalyticalCLR(λ, k))
 	fmt.Printf("CLR (Empirical; X/N = %d/%d) =   %.3f\n", len(rejects), totalEvents, mm1k.EmpiricalCLR(len(rejects), totalEvents))
 	fmt.Printf("Mean Service Time (S̄) =          %.3f\n", mm1k.Mean(completes, mm1k.Service))
 	fmt.Printf("Mean Wait Time (W̄) =             %.3f\n", mm1k.Mean(completes, mm1k.Wait))
 
-	for _, c := range sorted {
+	for _, customer := range sorted {
 		// L, L + 1, L + 10, and L + 11
-		if c.ID == L || c.ID == L+1 || c.ID == L+10 || c.ID == L+11 {
-			mm1k.PrintCustomer(c)
+		if customer.ID == l || customer.ID == l+1 || customer.ID == l+10 || customer.ID == l+11 {
+			mm1k.PrintCustomer(customer)
 		}
 	}
 
