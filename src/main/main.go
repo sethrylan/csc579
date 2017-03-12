@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	. "mm1k"
+	"mm1k"
 	"os"
 	"sort"
 	"strconv"
@@ -54,22 +54,22 @@ func main() {
 	fmt.Printf("C =    %d\n", C)
 	fmt.Printf("L =    %d\n", L)
 
-	completes, rejects := Simulate(λ, µ, K, C, seed)
+	completes, rejects := mm1k.Simulate(λ, µ, K, C, seed)
 
 	sorted := append(rejects, completes...)
-	sort.Sort(ByID(sorted))
+	sort.Sort(mm1k.ByID(sorted))
 	totalEvents := sorted[len(sorted)-1].ID + 1
 
 	fmt.Printf("Master clock =                   %.3f\n", completes[len(completes)-1].Departure)
-	fmt.Printf("CLR (Analytical) =               %.3f\n", AnalyticalCLR(λ, K))
-	fmt.Printf("CLR (Empirical; X/N = %d/%d) =   %.3f\n", len(rejects), totalEvents, EmpiricalCLR(len(rejects), totalEvents))
-	fmt.Printf("Mean Service Time (S̄) =          %.3f\n", Mean(completes, Service))
-	fmt.Printf("Mean Wait Time (W̄) =             %.3f\n", Mean(completes, Wait))
+	fmt.Printf("CLR (Analytical) =               %.3f\n", mm1k.AnalyticalCLR(λ, K))
+	fmt.Printf("CLR (Empirical; X/N = %d/%d) =   %.3f\n", len(rejects), totalEvents, mm1k.EmpiricalCLR(len(rejects), totalEvents))
+	fmt.Printf("Mean Service Time (S̄) =          %.3f\n", mm1k.Mean(completes, mm1k.Service))
+	fmt.Printf("Mean Wait Time (W̄) =             %.3f\n", mm1k.Mean(completes, mm1k.Wait))
 
 	for _, c := range sorted {
 		// L, L + 1, L + 10, and L + 11
 		if c.ID == L || c.ID == L+1 || c.ID == L+10 || c.ID == L+11 {
-			PrintCustomer(c)
+			mm1k.PrintCustomer(c)
 		}
 	}
 
