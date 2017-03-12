@@ -59,7 +59,6 @@ func Simulate(λ float64, µ float64, q Queue, C int, seed int64) (completes []C
 	return
 }
 
-
 // Run will continually add and service customers using an event loop
 func Run(arrivalDistribution Distribution, q Queue, serviceDistribution Distribution) (rejects, completes <-chan Customer) {
 	rejected := make(chan Customer)  // Unbuffered channels ensure deterministic simulation
@@ -69,8 +68,8 @@ func Run(arrivalDistribution Distribution, q Queue, serviceDistribution Distribu
 	go func() {
 		var t1 = arrivalDistribution.Get() // time of next arrival
 		var t2 = math.Inf(1)               // time of next completion (∞ for no schedule Customer)
-		var id int                                 // Incremented Customer ID
-		for {                                      // Do forever
+		var id int                         // Incremented Customer ID
+		for {                              // Do forever
 			if t1 < t2 { // If next arrival is before next completion -> Event: Arrival
 				clock = t1 // Set clock to time of next arrival.
 				if q.Full() {
