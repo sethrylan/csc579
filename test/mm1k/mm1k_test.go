@@ -5,13 +5,29 @@ import (
   "mm1k"
 )
 
+var simTests = []struct {
+  λ        float64
+  µ        float64
+  k        int
+  c         int
+  seed    int64
+  expectedRejects int
+}{
+  {0.1, 1.0, 10, 1000, 1, 0},
+  {0.3, 1.0, 10, 1000, 1, 0},
+  {0.5, 1.0, 10, 1000, 1, 0},
+  {0.7, 1.0, 10, 1000, 1, 8},
+  {0.9, 1.0, 10, 1000, 1, 45},
+}
+
 func TestSimulate(t *testing.T) {
-  λ := 0.5
-  µ := 1.0
-  K := 1
-  C := 10
-  completes, _ := mm1k.Simulate(λ, µ, mm1k.NewFIFOQueue(K), C, 1)
-  if (len(completes) != C) {
-    t.Errorf("Expected %d completes, got %d", C, len(completes))
+  for _, tt := range simTests {
+    completes, rejects := mm1k.Simulate(tt.λ, tt.µ, mm1k.NewFIFOQueue(tt.k), tt.c, tt.seed)
+    if (len(completes) != tt.c) {
+      t.Errorf("Expected %d completes, got %d", tt.c, len(completes))
+    }
+    if (len(rejects) != tt.expectedRejects) {
+      t.Errorf("Expected %d completes, got %d", tt.expectedRejects, len(rejects))
+    }
   }
 }
