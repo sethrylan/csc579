@@ -63,7 +63,7 @@ func Question1(seed int64) {
 	for _, C := range []int{1000, 100000} {
 		for ρ := 0.05; ρ <= 0.95; ρ += 0.10 {
 			fmt.Printf("%f, %d, %d | ", ρ, K, C)
-			completes, rejects := Simulate(ρ, 1.0, K, C, seed)
+			completes, rejects := Simulate(ρ, 1.0, NewFIFOQueue(K), C, seed)
 			sorted := append(rejects, completes...)
 			totalEvents := sorted[len(sorted)-1].ID + 1
 			sort.Sort(ByID(sorted))
@@ -81,7 +81,7 @@ func Question2(seed int64) {
 	for _, C := range []int{1000, 100000} {
 		for K := 10; K <= 100; K += 10 {
 			fmt.Printf("%f, %d, %d | ", ρ, K, C)
-			completes, rejects := Simulate(ρ, 1.0, K, C, seed)
+			completes, rejects := Simulate(ρ, 1.0, NewFIFOQueue(K), C, seed)
 			sorted := append(rejects, completes...)
 			totalEvents := sorted[len(sorted)-1].ID + 1
 			sort.Sort(ByID(sorted))
@@ -97,7 +97,7 @@ func Question3(seed int64) {
 	C := 100000
 	for ρ := 0.05; ρ <= 0.95; ρ += 0.10 {
 		fmt.Printf("%f, %d, %d | ", ρ, K, C)
-		completes, rejects := Simulate(ρ, 1.0, K, C, seed)
+		completes, rejects := Simulate(ρ, 1.0, NewFIFOQueue(K), C, seed)
 		sorted := append(rejects, completes...)
 		totalEvents := sorted[len(sorted)-1].ID + 1
 		sort.Sort(ByID(sorted))
@@ -116,7 +116,7 @@ func Question4(seed int64) {
 	C := 100000
 	for ρ := 0.05; ρ <= 0.95; ρ += 0.10 {
 		fmt.Printf("%f, %d, %d | ", ρ, K, C)
-		completes, rejects := Simulate(ρ, 1.0, K, C, seed)
+		completes, rejects := Simulate(ρ, 1.0, NewFIFOQueue(K), C, seed)
 		sorted := append(rejects, completes...)
 		sort.Sort(ByID(sorted))
 		fmt.Printf("W̄ = %.3f\n", Mean(completes, Wait))
@@ -132,7 +132,7 @@ func Question5(seed int64) {
 	for ρ := 0.05; ρ <= 0.95; ρ += 0.10 {
 		func() {
 			defer timeTrack(time.Now(), fmt.Sprintf("\nρ = %.2f", ρ))
-			Simulate(ρ, 1.0, K, C, seed)
+			Simulate(ρ, 1.0, NewFIFOQueue(K), C, seed)
 		}()
 	}
 	fmt.Printf("\n")

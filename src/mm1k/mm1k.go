@@ -38,12 +38,12 @@ type Queue interface {
 // Simulate will terminate once C customers have completed. Assume that
 // at time t = 0 the system is empty. Draw a random number to decide when the
 // first arrival will occur.
-func Simulate(λ float64, µ float64, K int, C int, seed int64) (completes []Customer, rejects []Customer) {
+func Simulate(λ float64, µ float64, q Queue, C int, seed int64) (completes []Customer, rejects []Customer) {
 	var customer Customer
 	var rejected, completed <-chan Customer
 	rejected, completed = Run(
 		NewExpDistribution(λ, seed),
-		NewFIFOQueue(K),
+		q,
 		NewExpDistribution(µ, seed+1),
 	)
 	for len(completes) < C {
@@ -58,6 +58,7 @@ func Simulate(λ float64, µ float64, K int, C int, seed int64) (completes []Cus
 	}
 	return
 }
+
 
 // Run will continually add and service customers using an event loop
 func Run(arrivalDistribution Distribution, q Queue, serviceDistribution Distribution) (rejects, completes <-chan Customer) {
