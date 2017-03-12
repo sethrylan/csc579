@@ -5,6 +5,6 @@ build:
 
     # Test the project
     - script:
-        name: make test
+        name: make build test
         code: |
           make test
