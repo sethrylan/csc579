@@ -28,5 +28,5 @@ test:
 vet:
 	go vet ./src/...
 
-tar:
-	tar czvf p1.tar.gz --exclude=".DS_Store" Makefile readme.md ./src ./test ./paper
+p1:
+	tar czvf p1.tar.gz --exclude=".DS_Store" Makefile readme.md ./src ./test ./p1/paper/
