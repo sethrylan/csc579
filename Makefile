@@ -16,15 +16,14 @@ fmt:
 	go fmt ./src/...
 
 # https://github.com/golang/lint
-# go get github.com/golang/lint/golint
 lint:
-	golint ./src
+	./bin/golint ./...
 
 run: build
 	./bin/qsim
 
 test:
-	go test ./test/...
+	go test -cover -v ./test/...
 
 vet:
 	go vet ./src/...
