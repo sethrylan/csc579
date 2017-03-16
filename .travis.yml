@@ -1,4 +1,4 @@
 language: go
-script: make lint test build
+script: make test build
 notifications:
   email: false
