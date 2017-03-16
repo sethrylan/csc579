@@ -1,6 +1,4 @@
 language: go
-before_install:
-  - go get -v github.com/golang/lint/golint
-script: make lint test build
+script: make test build
 notifications:
   email: false
