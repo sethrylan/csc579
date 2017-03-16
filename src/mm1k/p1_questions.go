@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// Question1 : Let the queue capacity K = 20. Plot the CLR against the value of ρ,
+// P1Question1 : Let the queue capacity K = 20. Plot the CLR against the value of ρ,
 // for ρ = 0.05 to ρ = 0.95, in increments of 0.10. Submit two graphs: one for
 // C = 1000 and one for C = 100000.
 func P1Question1(seed int64) {
@@ -24,7 +24,7 @@ func P1Question1(seed int64) {
 	}
 }
 
-// Question2 : Now let us fix ρ = 0.85. Plot the CLR against the value of the queue
+// P1Question2 : Now let us fix ρ = 0.85. Plot the CLR against the value of the queue
 // capacity K, as K increases from 10 to 100 in increments of 10. Again, submit
 // two graphs: one for C = 1000 and one for C = 100000.
 func P1Question2(seed int64) {
@@ -41,7 +41,7 @@ func P1Question2(seed int64) {
 	}
 }
 
-// Question3 : Let K = 20. For C = 100000 and for ρ = 0.05 to 0.95 (in increments of 0.10),
+// P1Question3 : Let K = 20. For C = 100000 and for ρ = 0.05 to 0.95 (in increments of 0.10),
 // plot the simulation and analytical values of CLR on the same graph.
 func P1Question3(seed int64) {
 	K := 20
@@ -58,7 +58,7 @@ func P1Question3(seed int64) {
 	}
 }
 
-// Question4 : Let us set K = 100 and C = 100000. Compute the average waiting time W of the
+// P1Question4 : Let us set K = 100 and C = 100000. Compute the average waiting time W of the
 // C customers that have received service at the end of the simulation (i.e.,
 // ignore any lost customers or customers waiting in the queue when the
 // simulation ends). Plot W against the value of ρ for ρ = 0.05 to 0.95.
@@ -72,7 +72,7 @@ func P1Question4(seed int64) {
 	}
 }
 
-// Question5 : Let us again set K = 40 and C = 100000. Time the running time of your
+// P1Question5 : Let us again set K = 40 and C = 100000. Time the running time of your
 // simulation for ρ = 0.05 to 0.95. Plot the running time against the value of
 // ρ. Note: turn off I/O
 func P1Question5(seed int64) {
