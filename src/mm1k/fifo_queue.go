@@ -3,21 +3,31 @@ package mm1k
 import (
 	"log"
 	"math"
+	"sync"
 )
 
 // FIFO queue implementation based on https://gist.github.com/moraes/2141121
 
+// FIFOQueue implements a queue with first-in-first-out behaviour
+type FIFOQueue struct {
+	a        []Customer
+	capacity int
+	lock     sync.Mutex
+}
+
 // receives a pointer so it can modify
 func (q *FIFOQueue) push(c Customer) {
-	q.len++
+	q.lock.Lock()
+	defer q.lock.Unlock()
 	q.a = append(q.a, c)
 }
 
 // receives a pointer so it can modify
 func (q *FIFOQueue) pop() (c Customer) {
+	q.lock.Lock()
+	defer q.lock.Unlock()
 	c = q.peek()
 	q.a = (q.a)[1:]
-	q.len--
 	return
 }
 
@@ -28,24 +38,17 @@ func (q *FIFOQueue) peek() (n Customer) {
 
 // Len implements mm1k.Queue.Len
 func (q *FIFOQueue) Len() int {
-	return q.len
+	return len(q.a)
 }
 
 // Full implements mm1k.Queue.Full
 func (q *FIFOQueue) Full() bool {
-	return q.len == q.size
-}
-
-// FIFOQueue implements a queue with first-in-first-out behaviour
-type FIFOQueue struct {
-	a    []Customer
-	size int
-	len  int
+	return q.Len() == q.capacity
 }
 
 // NewFIFOQueue returns a reference to a new FIFOQueue
 func NewFIFOQueue(c int) (fifo *FIFOQueue) {
-	return &FIFOQueue{a: make([]Customer, 0), size: c, len: 0}
+	return &FIFOQueue{a: make([]Customer, 0), capacity: c}
 }
 
 // Dequeue implements mm1k.Queue.Dequeue
@@ -59,8 +62,8 @@ func (q *FIFOQueue) Enqueue(customer Customer) (cus Customer) {
 		log.Panicln("queue is full")
 	}
 	customer.Position = q.Len()
-	if q.len > 0 {
-		customer.Start = math.Max(q.a[q.len-1].Start+q.a[q.len-1].Service, customer.Arrival)
+	if q.Len() > 0 {
+		customer.Start = math.Max(q.a[q.Len()-1].Start+q.a[q.Len()-1].Service, customer.Arrival)
 	} else {
 		customer.Start = customer.Arrival
 	}
