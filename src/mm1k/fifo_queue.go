@@ -15,7 +15,7 @@ func (q *FIFOQueue) push(c Customer) {
 
 // receives a pointer so it can modify
 func (q *FIFOQueue) pop() (c Customer) {
-	c = (q.a)[0]
+	c = q.peek()
 	q.a = (q.a)[1:]
 	q.len--
 	return
@@ -26,12 +26,12 @@ func (q *FIFOQueue) peek() (n Customer) {
 	return
 }
 
-// Len returns the length of the queue
+// Len implements mm1k.Queue.Len
 func (q *FIFOQueue) Len() int {
 	return q.len
 }
 
-// Full returns true is the queue is full
+// Full implements mm1k.Queue.Full
 func (q *FIFOQueue) Full() bool {
 	return q.len == q.size
 }
@@ -55,7 +55,7 @@ func (q *FIFOQueue) Dequeue() (c Customer) {
 
 // Enqueue implements mm1k.Queue.Enqueue
 func (q *FIFOQueue) Enqueue(customer Customer) (cus Customer) {
-	if q.len == q.size {
+	if q.Full() {
 		log.Panicln("queue is full")
 	}
 	customer.Position = q.Len()
