@@ -17,15 +17,11 @@ type FIFOQueue struct {
 
 // receives a pointer so it can modify
 func (q *FIFOQueue) push(c Customer) {
-	q.lock.Lock()
-	defer q.lock.Unlock()
 	q.a = append(q.a, c)
 }
 
 // receives a pointer so it can modify
 func (q *FIFOQueue) pop() (c Customer) {
-	q.lock.Lock()
-	defer q.lock.Unlock()
 	c = q.peek()
 	q.a = (q.a)[1:]
 	return
@@ -53,11 +49,15 @@ func NewFIFOQueue(c int) (fifo *FIFOQueue) {
 
 // Dequeue implements mm1k.Queue.Dequeue
 func (q *FIFOQueue) Dequeue() (c Customer) {
+	q.lock.Lock()
+	defer q.lock.Unlock()
 	return q.pop()
 }
 
 // Enqueue implements mm1k.Queue.Enqueue
 func (q *FIFOQueue) Enqueue(customer Customer) (cus Customer) {
+	q.lock.Lock()
+	defer q.lock.Unlock()
 	if q.Full() {
 		log.Panicln("queue is full")
 	}
