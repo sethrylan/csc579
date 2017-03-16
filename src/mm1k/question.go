@@ -116,9 +116,7 @@ func Question4(seed int64) {
 	C := 100000
 	for ρ := 0.05; ρ <= 0.95; ρ += 0.10 {
 		fmt.Printf("%f, %d, %d | ", ρ, K, C)
-		completes, rejects := Simulate(ρ, 1.0, NewFIFOQueue(K), C, seed)
-		sorted := append(rejects, completes...)
-		sort.Sort(ByID(sorted))
+		completes, _ := Simulate(ρ, 1.0, NewFIFOQueue(K), C, seed)
 		fmt.Printf("W̄ = %.3f\n", Mean(completes, Wait))
 	}
 }
