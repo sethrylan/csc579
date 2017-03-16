@@ -13,11 +13,11 @@ doc:
 
 # http://golang.org/cmd/go/#hdr-Run_gofmt_on_package_sources
 fmt:
-	go fmt ./src/...
+	go fmt mm1k main
 
 # https://github.com/golang/lint
 lint:
-	./bin/golint ./...
+	./bin/golint mm1k main
 
 run: build
 	./bin/qsim
@@ -26,7 +26,7 @@ test:
 	go test -cover -v ./test/...
 
 vet:
-	go vet ./src/...
+	go vet mm1k main
 
 p1:
 	tar czvf p1.tar.gz --exclude=".DS_Store" Makefile readme.md ./src ./test ./p1/paper/
