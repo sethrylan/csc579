@@ -26,6 +26,16 @@ func EmpiricalCLR(x int, n int) float64 {
 	return float64(x) / float64(n)
 }
 
+func AnalyticalWaitTime(ρ float64, K int) float64 {
+	k := float64(K)
+	p0 := (1 - ρ) / (1 - math.Pow(ρ, k+1))
+	pK := math.Pow(ρ, k) * p0
+	eff_lambda := (1 - pK) * ρ
+	L := ρ * (1 - (k+1)*math.Pow(ρ, k) + k*math.Pow(ρ, k+1)) * p0 / math.Pow((1-ρ), 2)
+	W := L / eff_lambda
+	return W
+}
+
 type field func(c Customer) float64
 
 // Service is a field for sorting customer.
