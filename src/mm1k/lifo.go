@@ -8,54 +8,54 @@ import (
 
 // LIFO stack implementation
 
-// LIFOQueue implements a stack with last-in-first-out behaviour
-type LIFOQueue struct {
+// LIFO implements a stack with last-in-first-out behaviour
+type LIFO struct {
 	a        []Customer
 	capacity int
 	lock     sync.Mutex
 }
 
 // receives a pointer so it can modify
-func (q *LIFOQueue) push(c Customer) {
+func (q *LIFO) push(c Customer) {
 	q.a = append(q.a, c)
 }
 
 // receives a pointer so it can modify
-func (q *LIFOQueue) pop() (c Customer) {
+func (q *LIFO) pop() (c Customer) {
 	c = q.peek()
 	q.a = (q.a)[:q.Len()-1]
 	return
 }
 
-func (q *LIFOQueue) peek() (n Customer) {
+func (q *LIFO) peek() (n Customer) {
 	n = (q.a)[q.Len()-1]
 	return
 }
 
 // Len implements mm1k.Queue.Len
-func (q *LIFOQueue) Len() int {
+func (q *LIFO) Len() int {
 	return len(q.a)
 }
 
 // Full implements mm1k.Queue.Full
-func (q *LIFOQueue) Full() bool {
+func (q *LIFO) Full() bool {
 	return q.Len() == q.capacity
 }
 
-// NewLIFOQueue returns a reference to a new FIFOQueue
-func NewLIFOQueue(c int) (lifo *LIFOQueue) {
-	return &LIFOQueue{a: make([]Customer, 0), capacity: c}
+// NewLIFO returns a reference to a new FIFO
+func NewLIFO(c int) (lifo *LIFO) {
+	return &LIFO{a: make([]Customer, 0), capacity: c}
 }
 
 // Dequeue implements mm1k.Queue.Dequeue
-func (q *LIFOQueue) Dequeue() (c Customer) {
+func (q *LIFO) Dequeue() (c Customer) {
 	q.lock.Lock()
 	defer q.lock.Unlock()
 	return q.pop()
 }
 
 // Enqueue implements mm1k.Queue.Enqueue
-func (q *LIFOQueue) Enqueue(customer Customer) (cus Customer) {
+func (q *LIFO) Enqueue(customer Customer) (cus Customer) {
 	q.lock.Lock()
 	defer q.lock.Unlock()
 	if q.Full() {
@@ -77,7 +77,7 @@ func (q *LIFOQueue) Enqueue(customer Customer) (cus Customer) {
 }
 
 // NextCompletion implements mm1k.Queue.NextCompletion
-func (q *LIFOQueue) NextCompletion() (next float64) {
+func (q *LIFO) NextCompletion() (next float64) {
 	if q.Len() > 0 {
 		next = q.peek().Start + q.peek().Service
 	} else {

@@ -8,54 +8,54 @@ import (
 
 // FIFO queue implementation based on https://gist.github.com/moraes/2141121
 
-// FIFOQueue implements a queue with first-in-first-out behaviour
-type FIFOQueue struct {
+// FIFO implements a queue with first-in-first-out behaviour
+type FIFO struct {
 	a        []Customer
 	capacity int
 	lock     sync.Mutex
 }
 
 // receives a pointer so it can modify
-func (q *FIFOQueue) push(c Customer) {
+func (q *FIFO) push(c Customer) {
 	q.a = append(q.a, c)
 }
 
 // receives a pointer so it can modify
-func (q *FIFOQueue) pop() (c Customer) {
+func (q *FIFO) pop() (c Customer) {
 	c = q.peek()
 	q.a = (q.a)[1:]
 	return
 }
 
-func (q *FIFOQueue) peek() (n Customer) {
+func (q *FIFO) peek() (n Customer) {
 	n = (q.a)[0]
 	return
 }
 
 // Len implements mm1k.Queue.Len
-func (q *FIFOQueue) Len() int {
+func (q *FIFO) Len() int {
 	return len(q.a)
 }
 
 // Full implements mm1k.Queue.Full
-func (q *FIFOQueue) Full() bool {
+func (q *FIFO) Full() bool {
 	return q.Len() == q.capacity
 }
 
-// NewFIFOQueue returns a reference to a new FIFOQueue
-func NewFIFOQueue(c int) (fifo *FIFOQueue) {
-	return &FIFOQueue{a: make([]Customer, 0), capacity: c}
+// NewFIFO returns a reference to a new FIFO
+func NewFIFO(c int) (fifo *FIFO) {
+	return &FIFO{a: make([]Customer, 0), capacity: c}
 }
 
 // Dequeue implements mm1k.Queue.Dequeue
-func (q *FIFOQueue) Dequeue() (c Customer) {
+func (q *FIFO) Dequeue() (c Customer) {
 	q.lock.Lock()
 	defer q.lock.Unlock()
 	return q.pop()
 }
 
 // Enqueue implements mm1k.Queue.Enqueue
-func (q *FIFOQueue) Enqueue(customer Customer) (cus Customer) {
+func (q *FIFO) Enqueue(customer Customer) (cus Customer) {
 	q.lock.Lock()
 	defer q.lock.Unlock()
 	if q.Full() {
@@ -72,7 +72,7 @@ func (q *FIFOQueue) Enqueue(customer Customer) (cus Customer) {
 }
 
 // NextCompletion implements mm1k.Queue.NextCompletion
-func (q *FIFOQueue) NextCompletion() (next float64) {
+func (q *FIFO) NextCompletion() (next float64) {
 	if q.Len() > 0 {
 		next = q.peek().Start + q.peek().Service
 	} else {

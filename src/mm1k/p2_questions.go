@@ -15,11 +15,11 @@ func P2Question1(seed int64) {
 	C := 100000
 	for ρ := 0.05; ρ <= 0.95; ρ += 0.10 {
 		fmt.Printf("FIFO %f, %d, %d | ", ρ, K, C)
-		completes, _ := Simulate(ρ, 1.0, NewFIFOQueue(K), C, seed)
+		completes, _ := Simulate(ρ, 1.0, NewFIFO(K), C, seed)
 		fmt.Printf("W̄ = %.3f\n", Mean(completes, Wait))
 
 		fmt.Printf("LIFO %f, %d, %d | ", ρ, K, C)
-		completes, _ = Simulate(ρ, 1.0, NewLIFOQueue(K), C, seed)
+		completes, _ = Simulate(ρ, 1.0, NewLIFO(K), C, seed)
 		fmt.Printf("W̄ = %.3f\n", Mean(completes, Wait))
 
 		// TODO: SJF

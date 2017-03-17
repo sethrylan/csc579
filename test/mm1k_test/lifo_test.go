@@ -5,10 +5,10 @@ import (
 	"mm1k"
 )
 
-func ExampleNewLIFOQueue() {
+func ExampleNewLIFO() {
 	// var t1 float64
 	var cus mm1k.Customer
-	q := mm1k.NewLIFOQueue(1)
+	q := mm1k.NewLIFO(1)
 
 	// Empty Queue
 	fmt.Printf("Len() = %d\n", q.Len())
@@ -42,8 +42,8 @@ func ExampleNewLIFOQueue() {
 	// Full() = false
 }
 
-func ExampleNewLIFOQueueAdd2() {
-	q := mm1k.NewLIFOQueue(2)
+func ExampleNewLIFOAdd2() {
+	q := mm1k.NewLIFO(2)
 
 	// Add 2 items
 	q.Enqueue(mm1k.Customer{ID: 1, Arrival: .5, Service: .1})
@@ -70,9 +70,9 @@ func ExampleNewLIFOQueueAdd2() {
 	// Full() = false
 }
 
-func ExampleNewLIFOQueueAdd2Overlap() {
+func ExampleNewLIFOAdd2Overlap() {
 	var cus mm1k.Customer
-	q := mm1k.NewLIFOQueue(2)
+	q := mm1k.NewLIFO(2)
 
 	// Add 2 items
 	cus = q.Enqueue(mm1k.Customer{ID: 1, Arrival: .5, Service: .5})
