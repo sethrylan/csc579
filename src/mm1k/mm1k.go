@@ -17,6 +17,20 @@ type Customer struct {
 	QueueAtDeparture int     // number of customers in queue at time of departure
 }
 
+// ByID implements sort.Interface for []Customer
+type ByID []Customer
+
+func (a ByID) Len() int           { return len(a) }
+func (a ByID) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByID) Less(i, j int) bool { return a[i].ID < a[j].ID }
+
+// byService implements sort.Interface for []Customer
+type byService []Customer
+
+func (a byService) Len() int           { return len(a) }
+func (a byService) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a byService) Less(i, j int) bool { return a[i].Service < a[j].Service }
+
 // A Queue type defines the common operations for a service queue
 type Queue interface {
 	// Enqueue adds customer to the queue
