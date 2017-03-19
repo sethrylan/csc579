@@ -22,8 +22,7 @@ func (q *FIFO) push(c Customer) {
 
 // receives a pointer so it can modify
 func (q *FIFO) pop() (c Customer) {
-	c = q.peek()
-	q.a = (q.a)[1:]
+	c, q.a = q.peek(), (q.a)[1:]
 	return
 }
 
