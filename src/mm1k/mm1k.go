@@ -31,6 +31,13 @@ func (a byService) Len() int           { return len(a) }
 func (a byService) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a byService) Less(i, j int) bool { return a[i].Service < a[j].Service }
 
+// byDeparture implements sort.Interface for []Customer
+type byDeparture []Customer
+
+func (a byDeparture) Len() int           { return len(a) }
+func (a byDeparture) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a byDeparture) Less(i, j int) bool { return a[i].Departure < a[j].Departure }
+
 // A Queue type defines the common operations for a service queue
 type Queue interface {
 	// Enqueue adds customer to the queue
