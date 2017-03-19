@@ -89,8 +89,39 @@ func ExampleNewLIFOAdd2Overlap() {
 
 	// Output:
 	// customer.(ID, Position, Start) = (1, 0, 0.50)
-	// customer.(ID, Position, Start) = (2, 1, 0.60)
-	// NextCompletion() = 1.10
-	// customer.(ID, Position, Start) = (2, 1, 0.60)
-	// NextCompletion() = 1.60
+	// customer.(ID, Position, Start) = (2, 0, 1.00)
+	// NextCompletion() = 1.00
+	// customer.(ID, Position, Start) = (1, 0, 0.50)
+	// NextCompletion() = 1.50
+}
+
+func ExampleNewLIFONonPreemption() {
+	var cus mm1k.Customer
+	q := mm1k.NewLIFO(10)
+
+	// Add 2 items
+	// cus = q.Enqueue(mm1k.Customer{ID: 0, Arrival: 0.991, Service: 0.097})
+	cus = q.Enqueue(mm1k.Customer{ID: 1, Arrival: 1.253, Service: 0.412})
+	cus = q.Enqueue(mm1k.Customer{ID: 2, Arrival: 1.559, Service: 1.500})
+	fmt.Printf("customer.(ID, Position, Start) = (%d, %d, %.3f)\n", cus.ID, cus.Position, cus.Start)
+
+	fmt.Printf("NextCompletion() = %.3f\n", q.NextCompletion())
+
+	// // Remove 1 item
+	cus = q.Dequeue()
+	fmt.Printf("customer.(ID, Position, Start) = (%d, %d, %.3f)\n", cus.ID, cus.Position, cus.Start)
+	fmt.Printf("NextCompletion() = %.3f\n", q.NextCompletion())
+
+	// // Remove 1 item
+	cus = q.Dequeue()
+	fmt.Printf("customer.(ID, Position, Start) = (%d, %d, %.3f)\n", cus.ID, cus.Position, cus.Start)
+	fmt.Printf("NextCompletion() = %.3f\n", q.NextCompletion())
+
+	// Output:
+	// customer.(ID, Position, Start) = (2, 0, 1.665)
+	// NextCompletion() = 1.665
+	// customer.(ID, Position, Start) = (1, 0, 1.253)
+	// NextCompletion() = 3.165
+	// customer.(ID, Position, Start) = (2, 0, 1.665)
+	// NextCompletion() = +Inf
 }

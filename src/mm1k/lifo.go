@@ -22,8 +22,7 @@ func (q *LIFO) push(c Customer) {
 
 // receives a pointer so it can modify
 func (q *LIFO) pop() (c Customer) {
-	c = q.peek()
-	q.a = (q.a)[:q.Len()-1]
+	c, q.a = q.peek(), (q.a)[:q.Len()-1]
 	return
 }
 
@@ -62,16 +61,29 @@ func (q *LIFO) Enqueue(customer Customer) (cus Customer) {
 		log.Panicln("queue is full")
 	}
 	customer.Position = q.Len()
-	// if q.Len() > 0 {
-	// 	customer.Start = math.Max(q.a[q.Len()-1].Start+q.a[q.Len()-1].Service, customer.Arrival)
-	// } else {
-	customer.Start = customer.Arrival
-	// }
-	q.push(customer)
 
-	// TODO: recalculate start times starting from end of stack
+	// If the new customer's arrival time is before the Start time of an existing
+	// customer, then we insert the new customer after (at an earlier index) than
+	// the existing customer. If we insert the new customer after the existing
+	// customer, then we have pre-empted the existing customer's place in the
+	// queue.
+	for i := q.Len() - 1; i >= 0 && customer.Arrival <= q.a[i].Start+q.a[i].Service; i-- {
+		// on last pass, i is equal to the intended position of the new customer
+		customer.Position = i
+	}
+
+	if customer.Position == q.Len() {
+		customer.Start = customer.Arrival
+	} else {
+		customer.Start = q.a[customer.Position].Start + q.a[customer.Position].Service
+	}
+	// append everything up to and including the nonPreemptive position + customer + rest of stack
+	q.a = append(q.a[:customer.Position], append([]Customer{customer}, q.a[customer.Position:]...)...)
+
+	// recalculate start times starting from end of stack
 	for i := q.Len() - 2; i >= 0; i-- {
 		q.a[i].Start = math.Max(q.a[i+1].Start+q.a[i+1].Service, q.a[i].Arrival)
+		log.Printf("non-preempting customer %d Start to %.03f\n", q.a[i].ID, q.a[i].Start)
 	}
 	return customer
 }
