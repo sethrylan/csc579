@@ -86,9 +86,9 @@ func Run(arrivalDistribution Distribution, q Queue, serviceDistribution Distribu
 				}
 				id++
 				t1 = clock + arrivalDistribution.Get() // Set t1 to time of next arrival.
-				if q.Len() == 1 {                      // If queue is not empty
-					t2 = q.NextCompletion() // then set t2 to time of next completion.
-				}
+				// if q.Len() > 0 {                       // If queue is not empty
+				t2 = q.NextCompletion() // then set t2 to time of next completion.
+				// }
 			} else { // If next arrival is after next completion -> Event: Departure
 				if !math.IsInf(t2, 1) { // if next completion exists
 					clock = t2                             // Set time to time of next completion.
@@ -112,10 +112,9 @@ func Run(arrivalDistribution Distribution, q Queue, serviceDistribution Distribu
 // customers, as well as the number of customers in the system immediately
 // after the departure of each of these customers"
 func PrintCustomer(c Customer) {
-	fmt.Printf("Customer %d (%d) | ", c.ID, c.Position)
-	fmt.Printf("Arrival, Service, Departure = %.3f, %.3f, %.3f\n", c.Arrival, c.Service, c.Departure)
+	fmt.Printf("Customer %02d (%02d) | Arrival, Service, [Start, Departure] = %.3f, %.3f, [%.3f, %.3f]\n", c.ID, c.Position, c.Arrival, c.Service, c.Start, c.Departure)
 }
 
 func logCustomer(c Customer) {
-	log.Printf("Customer %02d (%02d) | Arrival, Service, Departure = %.3f, %.3f, %.3f\n", c.ID, c.Position, c.Arrival, c.Service, c.Departure)
+	log.Printf("Customer %02d (%02d) | Arrival, Service, [Start, Departure] = %.3f, %.3f, [%.3f, %.3f]\n", c.ID, c.Position, c.Arrival, c.Service, c.Start, c.Departure)
 }
