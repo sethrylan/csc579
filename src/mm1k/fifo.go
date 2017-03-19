@@ -41,7 +41,7 @@ func (q *FIFO) Full() bool {
 	return q.Len() == q.capacity
 }
 
-// NewFIFO returns a reference to a new FIFO
+// NewFIFO returns a reference to a new FIFO queue
 func NewFIFO(c int) (fifo *FIFO) {
 	return &FIFO{a: make([]Customer, 0), capacity: c}
 }

@@ -41,7 +41,7 @@ func (q *LIFO) Full() bool {
 	return q.Len() == q.capacity
 }
 
-// NewLIFO returns a reference to a new FIFO
+// NewLIFO returns a reference to a new LIFO stack
 func NewLIFO(c int) (lifo *LIFO) {
 	return &LIFO{a: make([]Customer, 0), capacity: c}
 }

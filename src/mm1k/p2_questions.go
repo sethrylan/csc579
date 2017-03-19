@@ -25,7 +25,7 @@ func P2Question1(seed int64) {
 			for i := 0; i < replications; i++ {
 				fmt.Printf(".")
 				completes, _ := Simulate(ρ, µ, queue, C, seed+int64(i))
-				completes = removeFirstNByDeparture(completes, discard)
+				completes = RemoveFirstNByDeparture(completes, discard)
 				waitTimes[i] = Mean(completes, Wait)
 			}
 			sampleMean := MeanFloats(waitTimes)
