@@ -3,6 +3,8 @@ package mm1k
 import (
 	"fmt"
 	"math"
+	"reflect"
+	"sort"
 	"time"
 )
 
@@ -49,6 +51,11 @@ func Wait(c Customer) float64 {
 	return c.Departure - c.Arrival
 }
 
+// Wait is a field for sorting customer.
+func Departure(c Customer) float64 {
+	return c.Departure - c.Arrival
+}
+
 // Mean calculates the mean for field fn in a list of customers
 func Mean(customers []Customer, fn field) float64 {
 	total := 0.0
@@ -58,7 +65,40 @@ func Mean(customers []Customer, fn field) float64 {
 	return total / float64(len(customers))
 }
 
+// Mean calculates the mean for a list of floats
+func MeanFloats(values []float64) float64 {
+	total := 0.0
+	for _, v := range values {
+		total += v
+	}
+	return total / float64(len(values))
+}
+
+// See examples on https://github.com/ae6rt/golang-examples/blob/master/goeg/src/statistics_ans/statistics.go
+func StdDev(numbers []float64, mean float64) float64 {
+	total := 0.0
+	for _, number := range numbers {
+		total += math.Pow(number-mean, 2)
+	}
+	variance := total / float64(len(numbers)-1)
+	return math.Sqrt(variance)
+}
+
+// RemoveFirstNByDeparture removes the first n deparatures in a list of customers
+func removeFirstNByDeparture(customers []Customer, n int) []Customer {
+	sort.Sort(byDeparture(customers))
+	return customers[n:]
+}
+
 func timeTrack(start time.Time, name string) {
 	elapsed := time.Since(start)
 	fmt.Printf("%s took %s", name, elapsed)
+}
+
+func getType(myvar interface{}) string {
+	if t := reflect.TypeOf(myvar); t.Kind() == reflect.Ptr {
+		return "*" + t.Elem().Name()
+	} else {
+		return t.Name()
+	}
 }
