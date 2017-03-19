@@ -54,7 +54,7 @@ func main() {
 	fmt.Printf("C =    %d\n", c)
 	fmt.Printf("L =    %d\n", l)
 
-	completes, rejects := mm1k.Simulate(λ, µ, mm1k.NewFIFO(k), c, seed)
+	completes, rejects := mm1k.Simulate(λ, µ, mm1k.NewLIFO(k), c, seed)
 
 	sorted := append(rejects, completes...)
 	sort.Sort(mm1k.ByID(sorted))
