@@ -15,6 +15,7 @@ type Customer struct {
 	Departure        float64 // absolute time of completion/departure of the customer
 	Position         int     // position of this customer in the queue at time of arrival
 	QueueAtDeparture int     // number of customers in queue at time of departure
+	PriorityQueue    int     // the number of priority queue that the customer occupies
 }
 
 // ByID implements sort.Interface for []Customer
