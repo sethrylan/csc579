@@ -69,9 +69,9 @@ func main() {
 	case 3:
 		queue = mm1k.NewSJF(kcpu)
 	case 4:
-		queue = mm1k.NewPriority(kcpu, 4, false)
+		queue = mm1k.NewPriority(kcpu, false)
 	case 5:
-		queue = mm1k.NewPriority(kcpu, 4, true)
+		queue = mm1k.NewPriority(kcpu, true)
 	default:
 		fmt.Printf("usage: %s %s\n", os.Args[0], usageMsg)
 		os.Exit(1)
