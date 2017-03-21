@@ -65,10 +65,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	var completes, rejects []mm1k.Customer
 	switch l {
 	case 1:
-		completes, rejects = mm1k.Simulate(λ, µ, mm1k.QueueMakers[m-1](kcpu), c, seed)
+		mm1kSimulation()
 	case 2:
 		// TODO:
 		os.Exit(1)
@@ -77,6 +76,10 @@ func main() {
 		os.Exit(1)
 	}
 
+	mm1k.P2Question1(seed)
+}
+func mm1kSimulation() {
+	completes, rejects := mm1k.Simulate(λ, µ, mm1k.QueueMakers[m-1](kcpu), c, seed)
 	sorted := append(rejects, completes...)
 	sort.Sort(mm1k.ByID(sorted))
 	totalEvents := sorted[len(sorted)-1].ID + 1
@@ -99,5 +102,4 @@ func main() {
 		}
 	}
 
-	mm1k.P2Question1(seed)
 }
