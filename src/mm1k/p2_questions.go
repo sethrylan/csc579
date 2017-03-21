@@ -2,6 +2,7 @@ package mm1k
 
 import (
 	"fmt"
+	"log"
 	"reflect"
 	"runtime"
 	"sort"
@@ -88,14 +89,12 @@ func P2Question1(seed int64) {
 			for _, k := range keys {
 				sampleMean := MeanFloats(averageWaitTimes[k])
 				sampleStdDev := StdDev(averageWaitTimes[k], sampleMean)
-				fmt.Printf("  W̄%d = %.3f ±%.3f@95%%", k, sampleMean, sampleStdDev*2)
+				fmt.Printf("  W̄%d = %.3f ±%.3f", k, sampleMean, sampleStdDev*2)
+				if k == 0 {
+					fmt.Printf("@95%%")
+				}
 			}
 			fmt.Println()
-			// } else {
-			//  sampleMean := MeanFloats(waitTimes[0])
-			//  sampleStdDev := StdDev(waitTimes[0], sampleMean)
-			//  fmt.Printf("  W̄ = %.3f ±%.3f@95%%\n", sampleMean, sampleStdDev*2)
-			// }
 		}
 	}
 }
@@ -107,15 +106,15 @@ func replication(wg *sync.WaitGroup, i int, ρ float64, µ float64, queue Queue,
 	completes, _ := Simulate(ρ, µ, queue, C, seed+int64(i))
 	completes = RemoveFirstNByDeparture(completes, discard)
 
-	m := make(map[int][]Customer)
+	customersGroupedByQueue := make(map[int][]Customer)
 	for _, c := range completes {
-		m[c.PriorityQueue] = append(m[c.PriorityQueue], c)
+		customersGroupedByQueue[c.PriorityQueue] = append(customersGroupedByQueue[c.PriorityQueue], c)
 	}
 
-	averageWaitTimes := make([]float64, len(m))
-	for k := range m {
-		averageWaitTimes[k] = Mean(m[k], Wait)
-		// fmt.Printf("key[%s] value[%s]\n", k, m[k])
+	averageWaitTimes := make([]float64, len(customersGroupedByQueue))
+	for k := range customersGroupedByQueue {
+		averageWaitTimes[k] = Mean(customersGroupedByQueue[k], Wait)
+		log.Printf("W[%d]=%f\n, ", k, averageWaitTimes[k])
 	}
 	ch <- averageWaitTimes
 	return
