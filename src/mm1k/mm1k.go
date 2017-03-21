@@ -158,6 +158,7 @@ func logCustomer(c Customer) {
 	log.Printf("Customer %02d (%02d) | Arrival, Service, [Start, Departure] = %.3f, %.3f, [%.3f, %.3f]\n", c.ID, c.Position, c.Arrival, c.Service, c.Start, c.Departure)
 }
 
+// QueueMakers is a sorted list of queue generator functions
 var QueueMakers = []func(int) Queue{fifo, lifo, sjf, prioNP, prioP}
 
 func fifo(K int) Queue {
