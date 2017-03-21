@@ -10,16 +10,15 @@ const p int = 4
 
 // Priority implements a queue with first-in-first-out behaviour with multiple queues
 type Priority struct {
-	a          [4]FIFO
+	a          [p]FIFO
 	preemptive bool
 	next       int
+	generator  *rand.Rand
 }
 
 // receives a pointer so it can modify
 func (q *Priority) push(c Customer) {
-	c.PriorityQueue = q.next
 	q.a[q.next].push(c)
-	q.next = rand.Perm(p)[0] // values comes from default source
 }
 
 // receives a pointer so it can modify
@@ -57,7 +56,7 @@ func (q *Priority) Full() bool {
 
 // NewPriority returns a reference to a new Priority queue
 func NewPriority(c int, preemptive bool) (priority *Priority) {
-	priority = &Priority{a: [p]FIFO{*NewFIFO(c), *NewFIFO(c), *NewFIFO(c), *NewFIFO(c)}}
+	priority = &Priority{a: [p]FIFO{*NewFIFO(c), *NewFIFO(c), *NewFIFO(c), *NewFIFO(c)}, generator: rand.New(rand.NewSource(2))}
 	// for i := 0; i < p; i++ {
 	// 	priority.a[i] = *NewFIFO(c)
 	// }
@@ -74,8 +73,11 @@ func (q *Priority) Enqueue(customer Customer) (cus Customer) {
 	if q.Full() {
 		log.Panicln("queue is full")
 	}
+	customer.PriorityQueue = q.next
 	customer.Start = customer.Arrival
 	q.push(customer)
+	q.next = q.generator.Perm(p)[0] // values comes from default source
+
 	// sort.Sort(byService(q.a))
 
 	// TODO: stop preemption
