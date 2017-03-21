@@ -21,7 +21,7 @@ const usageMsg string = "λ K C L\n" +
 	"Kcpu = customers that the CPU queue may hold\n" +
 	"Kio = customers that the IO queue may hold\n" +
 	"C = customers served before the program terminates\n" +
-	"L = customers of interest; 1 < L < C\n" +
+	"L = 0–M/M/1 system, 1–CPU with I/O disks\n" +
 	"M = 1–FCFS, 2–LCFS-NP, 3–SJF-NP, 4–Prio-NP, 5–Prio-P"
 
 func init() {
@@ -60,23 +60,22 @@ func main() {
 	fmt.Printf("C =    %d\n", c)
 	fmt.Printf("L =    %d\n", l)
 
-	var queue mm1k.Queue
-	switch m {
+	if m > 5 || m < 1 {
+		fmt.Printf("usage: %s %s\n", os.Args[0], usageMsg)
+		os.Exit(1)
+	}
+
+	var completes, rejects []mm1k.Customer
+	switch l {
 	case 1:
-		queue = mm1k.NewFIFO(kcpu)
+		completes, rejects = mm1k.Simulate(λ, µ, mm1k.QueueMakers[m-1](kcpu), c, seed)
 	case 2:
-		queue = mm1k.NewLIFO(kcpu)
-	case 3:
-		queue = mm1k.NewSJF(kcpu)
-	case 4:
-		queue = mm1k.NewPriority(kcpu, false)
-	case 5:
-		queue = mm1k.NewPriority(kcpu, true)
+		// TODO:
+		os.Exit(1)
 	default:
 		fmt.Printf("usage: %s %s\n", os.Args[0], usageMsg)
 		os.Exit(1)
 	}
-	completes, rejects := mm1k.Simulate(λ, µ, queue, c, seed)
 
 	sorted := append(rejects, completes...)
 	sort.Sort(mm1k.ByID(sorted))
@@ -91,6 +90,7 @@ func main() {
 	fmt.Printf("CLR (Empirical; X/N = %d/%d) =   %.3f\n", len(rejects), totalEvents, mm1k.EmpiricalCLR(len(rejects), totalEvents))
 	fmt.Printf("Mean Service Time (S̄) =          %.3f\n", sampleServiceTimeMean)
 	fmt.Printf("Mean Wait Time (W̄) =             %.3f\n", mm1k.Mean(completes, mm1k.Wait))
+	fmt.Printf("Analytical Wait Time (W̄) =       %.3f\n", mm1k.AnalyticalWaitTime(λ, kcpu))
 
 	for _, customer := range sorted {
 		// L, L + 1, L + 10, and L + 11
