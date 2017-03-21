@@ -24,26 +24,6 @@ func getFunctionName(i interface{}) string {
 	return name[strings.LastIndex(name, ".")+1:]
 }
 
-func fifo(K int) Queue {
-	return NewFIFO(K)
-}
-
-func lifo(K int) Queue {
-	return NewLIFO(K)
-}
-
-func sjf(K int) Queue {
-	return NewSJF(K)
-}
-
-func prioNP(K int) Queue {
-	return NewPriority(K, true)
-}
-
-func prioP(K int) Queue {
-	return NewPriority(K, true)
-}
-
 type queueTimeMap map[int][]float64
 
 // NewFIFO(K), NewLIFO(K), NewSJF(K), NewPriority(K, true)
@@ -61,7 +41,7 @@ func P2Question1(seed int64) {
 	C := 100000
 	for ρ := 0.05; ρ <= 0.95; ρ += 0.10 {
 
-		for _, makerFunc := range []func(int) Queue{fifo, lifo, sjf, prioNP} {
+		for _, makerFunc := range QueueMakers {
 			var averageWaitTimes = make(queueTimeMap)
 			fmt.Printf("% 10s %f, %d, %d | ", getFunctionName(makerFunc), ρ, K, C)
 			averageWaitTimesChannel := make(chan []float64, replications)

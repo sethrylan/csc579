@@ -157,3 +157,25 @@ func PrintCustomer(c Customer) {
 func logCustomer(c Customer) {
 	log.Printf("Customer %02d (%02d) | Arrival, Service, [Start, Departure] = %.3f, %.3f, [%.3f, %.3f]\n", c.ID, c.Position, c.Arrival, c.Service, c.Start, c.Departure)
 }
+
+var QueueMakers = []func(int) Queue{fifo, lifo, sjf, prioNP, prioP}
+
+func fifo(K int) Queue {
+	return NewFIFO(K)
+}
+
+func lifo(K int) Queue {
+	return NewLIFO(K)
+}
+
+func sjf(K int) Queue {
+	return NewSJF(K)
+}
+
+func prioNP(K int) Queue {
+	return NewPriority(K, false)
+}
+
+func prioP(K int) Queue {
+	return NewPriority(K, true)
+}
