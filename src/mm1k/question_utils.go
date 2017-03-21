@@ -4,9 +4,41 @@ import (
 	"fmt"
 	"math"
 	"reflect"
+	"runtime"
 	"sort"
+	"strings"
 	"time"
 )
+
+type SimMetrics struct {
+	w float64
+	s float64
+}
+
+type SimMetricsList []SimMetrics
+
+func AverageWait(m SimMetrics) float64 {
+	return m.w
+}
+
+func AverageService(m SimMetrics) float64 {
+	return m.s
+}
+
+func (metricsList SimMetricsList) MeanAndStdDev(fn func(m SimMetrics) float64) (mean float64, stdDev float64) {
+	n := len(metricsList)
+	if n == 0 {
+		return 0.0, 0.0
+	}
+	sum, squareSum := 0.0, 0.0
+	for _, m := range metricsList {
+		sum += fn(m)
+		squareSum += math.Pow(fn(m), 2)
+	}
+	mean = sum / float64(n)
+	variance := squareSum/float64(n) - mean*mean
+	return mean, math.Sqrt(variance)
+}
 
 // AnalyticalCLR returns the Customer Loss Rate as a function of ρ and K
 // ρ = λ/µ < 1
@@ -48,26 +80,6 @@ func Mean(customers []Customer, fn field) float64 {
 	return total / float64(len(customers))
 }
 
-// MeanFloats calculates the mean for a list of floats
-func MeanFloats(values []float64) float64 {
-	total := 0.0
-	for _, v := range values {
-		total += v
-	}
-	return total / float64(len(values))
-}
-
-// StdDev implementation
-// See examples on https://github.com/ae6rt/golang-examples/blob/master/goeg/src/statistics_ans/statistics.go
-func StdDev(numbers []float64, mean float64) float64 {
-	total := 0.0
-	for _, number := range numbers {
-		total += math.Pow(number-mean, 2)
-	}
-	variance := total / float64(len(numbers)-1)
-	return math.Sqrt(variance)
-}
-
 // RemoveFirstNByDeparture removes the first n deparatures in a list of customers
 func RemoveFirstNByDeparture(customers []Customer, n int) []Customer {
 	sort.Sort(byDeparture(customers))
@@ -86,4 +98,9 @@ func getType(myvar interface{}) (s string) {
 		s = t.Name()
 	}
 	return
+}
+
+func getFunctionName(i interface{}) string {
+	name := runtime.FuncForPC(reflect.ValueOf(i).Pointer()).Name()
+	return name[strings.LastIndex(name, ".")+1:]
 }

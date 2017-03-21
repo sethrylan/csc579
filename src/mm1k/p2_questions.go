@@ -3,52 +3,13 @@ package mm1k
 import (
 	"fmt"
 	"log"
-	"math"
-	"reflect"
-	"runtime"
 	"sort"
-	"strings"
 	"sync"
 )
 
 var µ = 1.0
 var discard = 1000
 var replications = 30
-
-type SimMetrics struct {
-	w float64
-	s float64
-}
-
-type SimMetricsList []SimMetrics
-
-func AverageWait(m SimMetrics) float64 {
-	return m.w
-}
-
-func AverageService(m SimMetrics) float64 {
-	return m.s
-}
-
-func (metrics SimMetricsList) MeanAndStdDev(fn func(c SimMetrics) float64) (mean float64, stdDev float64) {
-	n := len(metrics)
-	if n == 0 {
-		return 0.0, 0.0
-	}
-	sum, squareSum := 0.0, 0.0
-	for _, m := range metrics {
-		sum += fn(m)
-		squareSum += math.Pow(fn(m), 2)
-	}
-	mean = sum / float64(n)
-	variance := squareSum/float64(n) - mean*mean
-	return mean, math.Sqrt(variance)
-}
-
-func getFunctionName(i interface{}) string {
-	name := runtime.FuncForPC(reflect.ValueOf(i).Pointer()).Name()
-	return name[strings.LastIndex(name, ".")+1:]
-}
 
 // P2Question1 : Let µ = 1 as before, the size of the queue K = 40, and the number
 // of customers served before a simulation run terminates C = 100,000. Plot the
