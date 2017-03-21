@@ -17,15 +17,11 @@ type Priority struct {
 }
 
 // receives a pointer so it can modify
-func (q *Priority) push(c Customer) {
-	q.a[q.next].push(c)
-}
-
-// receives a pointer so it can modify
 func (q *Priority) pop() (c Customer) {
 	for i := 0; i < p; i++ {
 		if q.a[i].Len() > 0 {
 			c = q.a[i].pop()
+			return
 		}
 	}
 	return
@@ -56,7 +52,10 @@ func (q *Priority) Full() bool {
 
 // NewPriority returns a reference to a new Priority queue
 func NewPriority(c int, preemptive bool) (priority *Priority) {
-	priority = &Priority{a: [p]FIFO{*NewFIFO(c), *NewFIFO(c), *NewFIFO(c), *NewFIFO(c)}, generator: rand.New(rand.NewSource(2))}
+	priority = &Priority{a: [p]FIFO{}, generator: rand.New(rand.NewSource(2))}
+	for i := 0; i < p; i++ {
+		priority.a[i] = *NewFIFO(c)
+	}
 	// for i := 0; i < p; i++ {
 	// 	priority.a[i] = *NewFIFO(c)
 	// }
@@ -75,7 +74,7 @@ func (q *Priority) Enqueue(customer Customer) (cus Customer) {
 	}
 	customer.PriorityQueue = q.next
 	customer.Start = customer.Arrival
-	q.push(customer)
+	q.a[q.next].Enqueue(customer)
 	q.next = q.generator.Perm(p)[0] // values comes from default source
 
 	// sort.Sort(byService(q.a))
