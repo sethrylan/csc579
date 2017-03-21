@@ -39,23 +39,6 @@ func AnalyticalWaitTime(ρ float64, K int) float64 {
 	return W
 }
 
-type field func(c Customer) float64
-
-// Service is a field for sorting customer.
-func Service(c Customer) float64 {
-	return c.Service
-}
-
-// Wait is a field for sorting customer.
-func Wait(c Customer) float64 {
-	return c.Start - c.Arrival
-}
-
-// Departure is a field for sorting customer.
-func Departure(c Customer) float64 {
-	return c.Departure - c.Arrival
-}
-
 // Mean calculates the mean for field fn in a list of customers
 func Mean(customers []Customer, fn field) float64 {
 	total := 0.0

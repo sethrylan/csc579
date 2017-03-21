@@ -39,6 +39,23 @@ func (a byDeparture) Len() int           { return len(a) }
 func (a byDeparture) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a byDeparture) Less(i, j int) bool { return a[i].Departure < a[j].Departure }
 
+type field func(c Customer) float64
+
+// Service is a field for sorting customer.
+func Service(c Customer) float64 {
+	return c.Service
+}
+
+// Wait is a field for sorting customer.
+func Wait(c Customer) float64 {
+	return c.Start - c.Arrival
+}
+
+// Departure is a field for sorting customer.
+func Departure(c Customer) float64 {
+	return c.Departure - c.Arrival
+}
+
 // A Queue type defines the common operations for a service queue
 type Queue interface {
 	// Enqueue adds customer to the queue
