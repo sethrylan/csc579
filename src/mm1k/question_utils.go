@@ -48,7 +48,7 @@ func Service(c Customer) float64 {
 
 // Wait is a field for sorting customer.
 func Wait(c Customer) float64 {
-	return c.Departure - c.Arrival
+	return c.Start - c.Arrival
 }
 
 // Departure is a field for sorting customer.
