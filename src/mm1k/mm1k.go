@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"sync"
 )
 
 // A Customer contains tracking and history for a customer
@@ -74,9 +75,49 @@ type Queue interface {
 	Full() bool
 }
 
-// Simulate will terminate once C customers have completed. Assume that
-// at time t = 0 the system is empty. Draw a random number to decide when the
-// first arrival will occur.
+// SimulateReplications will terminate once C customers have completed.
+func SimulateReplications(λ float64, µ float64, makerFunc func(int) Queue, K int, C int, replications int, discard int, seed int64) map[int]SimMetricsList {
+	var metricsByQueue = make(map[int]SimMetricsList)
+	metricsChannel := make(chan SimMetricsList, replications) // the metrics list will be len 0 < x <= p, where x is the number of queues for priority queues.
+
+	var wg sync.WaitGroup
+	for i := 0; i < replications; i++ {
+		wg.Add(1)
+		go replication(&wg, i, λ, µ, makerFunc(K), C, seed, metricsChannel)
+	}
+	wg.Wait()
+	close(metricsChannel)
+
+	for waitTimesArray := range metricsChannel {
+		for queueIndex, w := range waitTimesArray {
+			metricsByQueue[queueIndex] = append(metricsByQueue[queueIndex], w)
+		}
+	}
+	return metricsByQueue
+}
+
+// Yield the metrics per queue (after discard)
+func replication(wg *sync.WaitGroup, i int, ρ float64, µ float64, queue Queue, C int, seed int64, ch chan<- SimMetricsList) {
+	defer wg.Done()
+	defer fmt.Printf(".")
+	completes, _ := Simulate(ρ, µ, queue, C, seed+int64(i))
+	completes = RemoveFirstNByDeparture(completes, discard)
+
+	customersGroupedByQueue := make(map[int][]Customer)
+	for _, c := range completes {
+		customersGroupedByQueue[c.PriorityQueue] = append(customersGroupedByQueue[c.PriorityQueue], c)
+	}
+
+	averageWaitTimesByQueue := make(SimMetricsList, len(customersGroupedByQueue))
+	for k := range customersGroupedByQueue {
+		averageWaitTimesByQueue[k].w = Mean(customersGroupedByQueue[k], Wait)
+		log.Printf("W[%d]=%f\n, ", k, averageWaitTimesByQueue[k])
+	}
+	ch <- averageWaitTimesByQueue
+	return
+}
+
+// Simulate will terminate once C customers have completed.
 func Simulate(λ float64, µ float64, q Queue, C int, seed int64) (completes []Customer, rejects []Customer) {
 	var customer Customer
 	var rejected, completed <-chan Customer
@@ -98,7 +139,9 @@ func Simulate(λ float64, µ float64, q Queue, C int, seed int64) (completes []C
 	return
 }
 
-// Run will continually add and service customers using an event loop
+// Run will continually add and service customers using an event loop. At time
+// t = 0 the system is empty. Draw a random number to decide when the
+// first arrival will occur.
 func Run(arrivalDistribution Distribution, q Queue, serviceDistribution Distribution) (rejects, completes <-chan Customer) {
 	rejected := make(chan Customer)  // Unbuffered channels ensure deterministic simulation
 	completed := make(chan Customer) //

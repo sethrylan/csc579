@@ -2,14 +2,11 @@ package mm1k
 
 import (
 	"fmt"
-	"log"
 	"sort"
-	"sync"
 )
 
 var µ = 1.0
 var discard = 1000
-var replications = 30
 
 // P2Question1 : Let µ = 1 as before, the size of the queue K = 40, and the number
 // of customers served before a simulation run terminates C = 100,000. Plot the
@@ -19,31 +16,14 @@ var replications = 30
 // particular, for the Priority service disciplines, plot the average waiting
 // time of each of the four classes of customers, as well as the overall
 // average.
-func P2Question1(seed int64) {
+func P2Question1(replications int, seed int64) {
 	K := 40
 	C := 100000
 	for ρ := 0.05; ρ <= 0.95; ρ += 0.10 {
-
 		for _, makerFunc := range QueueMakers {
-			var metricsByQueue = make(map[int]SimMetricsList)
 			fmt.Printf("% 10s %f, %d, %d | ", getFunctionName(makerFunc), ρ, K, C)
-			metricsChannel := make(chan SimMetricsList, replications) // the metrics list will be len 0 < x <= p, where x is the number of queues for priority queues.
 
-			var wg sync.WaitGroup
-			for i := 0; i < replications; i++ {
-				wg.Add(1)
-				queue := makerFunc(K)
-				go replication(&wg, i, ρ, µ, queue, C, seed, metricsChannel)
-			}
-			wg.Wait()
-			close(metricsChannel)
-
-			for waitTimesArray := range metricsChannel {
-				for queueIndex, w := range waitTimesArray {
-					metricsByQueue[queueIndex] = append(metricsByQueue[queueIndex], w)
-				}
-			}
-
+			metricsByQueue := SimulateReplications(ρ, µ, makerFunc, K, C, replications, discard, seed)
 			var keys []int
 			for k := range metricsByQueue {
 				keys = append(keys, k)
@@ -59,25 +39,4 @@ func P2Question1(seed int64) {
 			fmt.Println()
 		}
 	}
-}
-
-// Yield the average wait time per queue (after discard)
-func replication(wg *sync.WaitGroup, i int, ρ float64, µ float64, queue Queue, C int, seed int64, ch chan<- SimMetricsList) {
-	defer wg.Done()
-	defer fmt.Printf(".")
-	completes, _ := Simulate(ρ, µ, queue, C, seed+int64(i))
-	completes = RemoveFirstNByDeparture(completes, discard)
-
-	customersGroupedByQueue := make(map[int][]Customer)
-	for _, c := range completes {
-		customersGroupedByQueue[c.PriorityQueue] = append(customersGroupedByQueue[c.PriorityQueue], c)
-	}
-
-	averageWaitTimesByQueue := make(SimMetricsList, len(customersGroupedByQueue))
-	for k := range customersGroupedByQueue {
-		averageWaitTimesByQueue[k].w = Mean(customersGroupedByQueue[k], Wait)
-		log.Printf("W[%d]=%f\n, ", k, averageWaitTimesByQueue[k])
-	}
-	ch <- averageWaitTimesByQueue
-	return
 }

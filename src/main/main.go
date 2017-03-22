@@ -15,6 +15,8 @@ var λ, µ float64
 var kcpu, kio, c, l, m int
 
 const seed int64 = 42
+const discard int = 1000
+const replications int = 30
 
 const usageMsg string = "λ K C L\n" +
 	"λ = distribution of interarrival times\n" +
@@ -67,7 +69,7 @@ func main() {
 
 	switch l {
 	case 1:
-		mm1kSimulation()
+		mm1kSimulation(seed)
 	case 2:
 		// TODO:
 		os.Exit(1)
@@ -76,9 +78,18 @@ func main() {
 		os.Exit(1)
 	}
 
-	mm1k.P2Question1(seed)
+	mm1k.P2Question1(replications, seed)
 }
-func mm1kSimulation() {
+
+// func mm1kSimulationWithReplication(seed int64) {
+// 	metricsListByQueue := mm1k.SimulateReplications(λ, µ, mm1k.QueueMakers[m-1], kcpu, c, replications, discard, seed)
+// 	fmt.Printf("Master clock =                   %.3f\n", completes[len(completes)-1].Departure)
+// 	fmt.Printf("Mean Service Time (S̄) =          %.3f\n", sampleServiceTimeMean)
+// 	fmt.Printf("Mean Wait Time (W̄) =             %.3f\n", mm1k.Mean(completes, mm1k.Wait))
+// 	fmt.Printf("Analytical Wait Time (W̄) =       %.3f\n", mm1k.AnalyticalWaitTime(λ, kcpu))
+// }
+
+func mm1kSimulation(seed int64) {
 	completes, rejects := mm1k.Simulate(λ, µ, mm1k.QueueMakers[m-1](kcpu), c, seed)
 	sorted := append(rejects, completes...)
 	sort.Sort(mm1k.ByID(sorted))
