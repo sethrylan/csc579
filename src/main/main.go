@@ -84,20 +84,19 @@ func main() {
 	mm1k.P2Question1(replications, seed)
 }
 
+// P2 implementation
 func mm1kSimulationWithReplication(seed int64) {
 	metricsListByQueue := mm1k.SimulateReplications(λ, µ, mm1k.QueueMakers[m-1], kcpu, c, replications, discard, seed)
 	mm1k.PrintMetricsListQueueMap(metricsListByQueue)
 }
 
+// P1 implementation
 func mm1kSimulation(seed int64) {
 	completes, rejects := mm1k.Simulate(λ, µ, mm1k.QueueMakers[m-1](kcpu), c, seed)
 	sorted := append(rejects, completes...)
 	sort.Sort(mm1k.ByID(sorted))
 	totalEvents := sorted[len(sorted)-1].ID + 1
-
 	sampleServiceTimeMean := mm1k.Mean(completes, mm1k.Service)
-	//TODO: run simpulation 30 to compute confidence intervals:
-	//  sampleServiceTimeVariance = mm1k.StdDev(completes, sampleServiceTimeMean)
 
 	fmt.Printf("Master clock =                   %.3f\n", completes[len(completes)-1].Departure)
 	fmt.Printf("CLR (Analytical) =               %.3f\n", mm1k.AnalyticalCLR(λ, kcpu))
