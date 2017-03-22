@@ -268,7 +268,7 @@ func lifo(K int) Queue {
 }
 
 func sjf(K int) Queue {
-	return NewSJF(K)
+	return NewSJF(K, false)
 }
 
 func prioNP(K int) Queue {

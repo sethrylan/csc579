@@ -11,9 +11,10 @@ import (
 
 // SJF implements a queue with shortest job first semantics behaviour
 type SJF struct {
-	a        []Customer
-	capacity int
-	lock     sync.Mutex
+	a          []Customer
+	capacity   int
+	preemptive bool
+	lock       sync.Mutex
 }
 
 // receives a pointer so it can modify
@@ -43,8 +44,8 @@ func (q *SJF) Full() bool {
 }
 
 // NewSJF returns a reference to a new SJF
-func NewSJF(c int) (sjf *SJF) {
-	return &SJF{a: make([]Customer, 0), capacity: c}
+func NewSJF(c int, preemptive bool) (sjf *SJF) {
+	return &SJF{a: make([]Customer, 0), capacity: c, preemptive: preemptive}
 }
 
 // Dequeue implements mm1k.Queue.Dequeue
@@ -62,19 +63,34 @@ func (q *SJF) Enqueue(customer Customer) (cus Customer) {
 		log.Panicln("queue is full")
 	}
 
-	// TODO: stop preemption
-	// compose queue so that
-	//    [a...] + cus + [b...],
-	// where a is the list customers with a startTime > cus.arrival and b is the list of remaining customers
-	customer.Start = customer.Arrival
-	q.push(customer)
-	sort.Sort(byService(q.a))
+	if q.preemptive {
+		customer.Start = customer.Arrival
+		q.push(customer)
+		sort.Sort(byService(q.a))
+	} else {
+		// compose queue so that
+		//    [a...] + cus + [b...],
+		// where a is the list customers with a startTime > cus.arrival and b is the list of remaining customers
 
+		for i := 0; i < q.Len() && customer.Start < q.a[i].Start+q.a[i].Service; i++ {
+			// on last pass, i is equal to the intended position of the new customer
+			customer.Position = i
+		}
+
+		if customer.Position == 0 {
+			customer.Start = customer.Arrival
+		} else {
+			customer.Start = q.a[customer.Position].Start + q.a[customer.Position].Service
+		}
+		q.a = append(q.a[:customer.Position], append([]Customer{customer}, q.a[customer.Position:]...)...)
+
+	}
 	// recalculate start times starting from beginning of queue
 	for i := 1; i < q.Len()-1; i++ {
 		q.a[i].Start = math.Max(q.a[i+1].Start+q.a[i+1].Service, q.a[i].Arrival)
 		log.Printf("non-preempting customer %d Start to %.03f\n", q.a[i].ID, q.a[i].Start)
 	}
+
 	return customer
 }
 
