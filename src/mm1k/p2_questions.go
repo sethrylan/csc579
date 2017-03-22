@@ -14,12 +14,12 @@ var discard = 1000
 // time of each of the four classes of customers, as well as the overall
 // average.
 func P2Question1(replications int, seed int64) {
-	fmt.Printf("Starting P2Question1\n")
+	fmt.Printf("\n=======Starting P2Question1=======\n")
 	K := 40
 	C := 100000
 	for ρ := 0.05; ρ <= 0.95; ρ += 0.10 {
 		for _, makerFunc := range QueueMakers {
-			fmt.Printf("%s %f, %d, %d | ", getFunctionName(makerFunc), ρ, K, C)
+			fmt.Printf("\n%s %f, %d, %d | ", getFunctionName(makerFunc), ρ, K, C)
 			metricsByQueue := SimulateReplications(ρ, µ, makerFunc, K, C, replications, discard, seed)
 			PrintMetricsListQueueMap(metricsByQueue)
 		}

@@ -218,24 +218,25 @@ func PrintMetricsListQueueMap(metricsListByQueue map[int]SimMetricsList) {
 		maxDeparture = math.Max(metricsListByQueue[k][len(metricsListByQueue[k])-1].lastDeparture, maxDeparture)
 	}
 
-	fmt.Printf("\n  Clock = %.3f (all queues, last replication)\n", maxDeparture)
+	fmt.Printf("\nClock = %.3f (all queues, last replication)\n", maxDeparture)
 
 	//
 	for _, k := range keys {
 		sampleMean, sampleStdDev = metricsListByQueue[k].MeanAndStdDev(AverageWait)
-		fmt.Printf("  W̄%d = %.3f ±%.3f", k, sampleMean, sampleStdDev*2)
 		if k == 0 {
-			fmt.Printf("@95%%")
+			fmt.Printf("W̄ = ")
 		}
+		fmt.Printf(" %.3f±%.3f", sampleMean, sampleStdDev*2) // Print 95% confidence interval
+
 	}
 	fmt.Println()
 
 	for _, k := range keys {
 		sampleMean, sampleStdDev = metricsListByQueue[k].MeanAndStdDev(AverageService)
-		fmt.Printf("  S̄%d = %.3f ±%.3f", k, sampleMean, sampleStdDev*2)
 		if k == 0 {
-			fmt.Printf("@95%%")
+			fmt.Printf("S̄ = ")
 		}
+		fmt.Printf(" %.3f±%.3f", sampleMean, sampleStdDev*2) // Print 95% confidence interval
 	}
 	fmt.Println()
 
