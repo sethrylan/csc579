@@ -14,6 +14,7 @@ type SimMetrics struct {
 	w             float64
 	s             float64
 	lastDeparture float64
+	clr           float64
 }
 
 type SimMetricsList []SimMetrics
@@ -24,6 +25,10 @@ func AverageWait(m SimMetrics) float64 {
 
 func AverageService(m SimMetrics) float64 {
 	return m.s
+}
+
+func CLR(m SimMetrics) float64 {
+	return m.clr
 }
 
 func (metricsList SimMetricsList) MeanAndStdDev(fn func(m SimMetrics) float64) (mean float64, stdDev float64) {

@@ -101,20 +101,27 @@ func SimulateReplications(λ float64, µ float64, makerFunc func(int) Queue, K i
 func replication(wg *sync.WaitGroup, i int, ρ float64, µ float64, queue Queue, C int, seed int64, ch chan<- SimMetricsList) {
 	defer wg.Done()
 	defer fmt.Printf(".")
-	completes, _ := Simulate(ρ, µ, queue, C, seed+int64(i))
+	completes, rejects := Simulate(ρ, µ, queue, C, seed+int64(i))
 	completes = RemoveFirstNByDeparture(completes, discard)
 
-	customersGroupedByQueue := make(map[int][]Customer)
+	completesByQueue := make(map[int][]Customer)
+	rejectsByQueue := make(map[int][]Customer)
+
 	for _, c := range completes {
-		customersGroupedByQueue[c.PriorityQueue] = append(customersGroupedByQueue[c.PriorityQueue], c)
+		completesByQueue[c.PriorityQueue] = append(completesByQueue[c.PriorityQueue], c)
 	}
 
-	metricsListByQueue := make(SimMetricsList, len(customersGroupedByQueue))
-	for k := range customersGroupedByQueue {
-		metricsListByQueue[k].w = Mean(customersGroupedByQueue[k], Wait)
-		metricsListByQueue[k].s = Mean(customersGroupedByQueue[k], Service)
-		sort.Sort(byDeparture(customersGroupedByQueue[k]))
-		metricsListByQueue[k].lastDeparture = customersGroupedByQueue[k][len(customersGroupedByQueue[k])-1].Departure
+	for _, c := range rejects {
+		rejectsByQueue[c.PriorityQueue] = append(rejectsByQueue[c.PriorityQueue], c)
+	}
+
+	metricsListByQueue := make(SimMetricsList, len(completesByQueue))
+	for k := range completesByQueue {
+		metricsListByQueue[k].w = Mean(completesByQueue[k], Wait)
+		metricsListByQueue[k].s = Mean(completesByQueue[k], Service)
+		sort.Sort(byDeparture(completesByQueue[k]))
+		metricsListByQueue[k].lastDeparture = completesByQueue[k][len(completesByQueue[k])-1].Departure
+		metricsListByQueue[k].clr = EmpiricalCLR(len(rejectsByQueue[k]), len(rejectsByQueue[k])+len(completesByQueue[k]))
 	}
 	ch <- metricsListByQueue
 	return
@@ -218,13 +225,12 @@ func PrintMetricsListQueueMap(metricsListByQueue map[int]SimMetricsList) {
 		maxDeparture = math.Max(metricsListByQueue[k][len(metricsListByQueue[k])-1].lastDeparture, maxDeparture)
 	}
 
-	fmt.Printf("\nClock = %.3f (all queues, last replication)\n", maxDeparture)
+	fmt.Printf("\nClock        = %.3f (all queues, last replication)\n", maxDeparture)
 
-	//
 	for _, k := range keys {
 		sampleMean, sampleStdDev = metricsListByQueue[k].MeanAndStdDev(AverageWait)
 		if k == 0 {
-			fmt.Printf("W̄ = ")
+			fmt.Printf("W̄            =")
 		}
 		fmt.Printf(" %.3f±%.3f", sampleMean, sampleStdDev*2) // Print 95% confidence interval
 
@@ -234,12 +240,20 @@ func PrintMetricsListQueueMap(metricsListByQueue map[int]SimMetricsList) {
 	for _, k := range keys {
 		sampleMean, sampleStdDev = metricsListByQueue[k].MeanAndStdDev(AverageService)
 		if k == 0 {
-			fmt.Printf("S̄ = ")
+			fmt.Printf("S̄            =")
 		}
 		fmt.Printf(" %.3f±%.3f", sampleMean, sampleStdDev*2) // Print 95% confidence interval
 	}
 	fmt.Println()
 
+	for _, k := range keys {
+		sampleMean, sampleStdDev = metricsListByQueue[k].MeanAndStdDev(CLR)
+		if k == 0 {
+			fmt.Printf("CLR          =")
+		}
+		fmt.Printf(" %.3f±%.3f", sampleMean, sampleStdDev*2) // Print 95% confidence interval
+	}
+	fmt.Println()
 }
 
 // QueueMakers is a sorted list of queue generator functions
