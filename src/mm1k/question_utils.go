@@ -94,7 +94,7 @@ func RemoveFirstNByDeparture(customers []Customer, n int) []Customer {
 
 func timeTrack(start time.Time, name string) {
 	elapsed := time.Since(start)
-	fmt.Printf("%s took %s", name, elapsed)
+	fmt.Printf("%s took %.3f", name, elapsed.Seconds())
 }
 
 func getType(myvar interface{}) (s string) {
