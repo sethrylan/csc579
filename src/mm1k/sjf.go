@@ -68,9 +68,11 @@ func (q *SJF) Enqueue(customer Customer) (cus Customer) {
 		q.push(customer)
 		sort.Sort(byService(q.a))
 	} else {
-		// compose queue so that
+		// NonPreemptive
+		// Compose queue so that
 		//    [a...] + cus + [b...],
 		// where a is the list customers with a startTime > cus.arrival and b is the list of remaining customers
+		// The tail (cus + [b...]) must be sorted by service time
 
 		for i := 0; i < q.Len() && customer.Start < q.a[i].Start+q.a[i].Service; i++ {
 			// on last pass, i is equal to the intended position of the new customer
@@ -79,10 +81,11 @@ func (q *SJF) Enqueue(customer Customer) (cus Customer) {
 
 		if customer.Position == 0 {
 			customer.Start = customer.Arrival
-		} else {
-			customer.Start = q.a[customer.Position].Start + q.a[customer.Position].Service
 		}
-		q.a = append(q.a[:customer.Position], append([]Customer{customer}, q.a[customer.Position:]...)...)
+
+		tail := append([]Customer{customer}, q.a[customer.Position:]...)
+		sort.Sort(byService(tail))
+		q.a = append(q.a[:customer.Position], tail...)
 
 	}
 	// recalculate start times starting from beginning of queue
