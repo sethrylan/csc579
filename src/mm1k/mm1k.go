@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"sort"
 	"sync"
 )
 
@@ -108,12 +109,14 @@ func replication(wg *sync.WaitGroup, i int, ρ float64, µ float64, queue Queue,
 		customersGroupedByQueue[c.PriorityQueue] = append(customersGroupedByQueue[c.PriorityQueue], c)
 	}
 
-	averageWaitTimesByQueue := make(SimMetricsList, len(customersGroupedByQueue))
+	metricsListByQueue := make(SimMetricsList, len(customersGroupedByQueue))
 	for k := range customersGroupedByQueue {
-		averageWaitTimesByQueue[k].w = Mean(customersGroupedByQueue[k], Wait)
-		log.Printf("W[%d]=%f\n, ", k, averageWaitTimesByQueue[k])
+		metricsListByQueue[k].w = Mean(customersGroupedByQueue[k], Wait)
+		metricsListByQueue[k].s = Mean(customersGroupedByQueue[k], Service)
+		sort.Sort(byDeparture(customersGroupedByQueue[k]))
+		metricsListByQueue[k].lastDeparture = customersGroupedByQueue[k][len(customersGroupedByQueue[k])-1].Departure
 	}
-	ch <- averageWaitTimesByQueue
+	ch <- metricsListByQueue
 	return
 }
 
@@ -199,6 +202,43 @@ func PrintCustomer(c Customer) {
 
 func logCustomer(c Customer) {
 	log.Printf("Customer %02d (%02d) | Arrival, Service, [Start, Departure] = %.3f, %.3f, [%.3f, %.3f]\n", c.ID, c.Position, c.Arrival, c.Service, c.Start, c.Departure)
+}
+
+func PrintMetricsListQueueMap(metricsListByQueue map[int]SimMetricsList) {
+	var keys []int
+	var sampleMean, sampleStdDev float64
+	var maxDeparture float64
+
+	for k := range metricsListByQueue {
+		keys = append(keys, k)
+	}
+	sort.Ints(keys)
+
+	for _, k := range keys {
+		maxDeparture = math.Max(metricsListByQueue[k][len(metricsListByQueue[k])-1].lastDeparture, maxDeparture)
+	}
+
+	fmt.Printf("\n  Clock = %.3f (all queues, last replication)\n", maxDeparture)
+
+	//
+	for _, k := range keys {
+		sampleMean, sampleStdDev = metricsListByQueue[k].MeanAndStdDev(AverageWait)
+		fmt.Printf("  W̄%d = %.3f ±%.3f", k, sampleMean, sampleStdDev*2)
+		if k == 0 {
+			fmt.Printf("@95%%")
+		}
+	}
+	fmt.Println()
+
+	for _, k := range keys {
+		sampleMean, sampleStdDev = metricsListByQueue[k].MeanAndStdDev(AverageService)
+		fmt.Printf("  S̄%d = %.3f ±%.3f", k, sampleMean, sampleStdDev*2)
+		if k == 0 {
+			fmt.Printf("@95%%")
+		}
+	}
+	fmt.Println()
+
 }
 
 // QueueMakers is a sorted list of queue generator functions

@@ -11,8 +11,9 @@ import (
 )
 
 type SimMetrics struct {
-	w float64
-	s float64
+	w             float64
+	s             float64
+	lastDeparture float64
 }
 
 type SimMetricsList []SimMetrics

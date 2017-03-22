@@ -69,7 +69,10 @@ func main() {
 
 	switch l {
 	case 1:
-		mm1kSimulation(seed)
+		if c <= discard {
+			fmt.Printf("WARNING: first %d events are discarded in metric calculations\n", discard)
+		}
+		mm1kSimulationWithReplication(seed)
 	case 2:
 		// TODO:
 		os.Exit(1)
@@ -81,13 +84,10 @@ func main() {
 	mm1k.P2Question1(replications, seed)
 }
 
-// func mm1kSimulationWithReplication(seed int64) {
-// 	metricsListByQueue := mm1k.SimulateReplications(λ, µ, mm1k.QueueMakers[m-1], kcpu, c, replications, discard, seed)
-// 	fmt.Printf("Master clock =                   %.3f\n", completes[len(completes)-1].Departure)
-// 	fmt.Printf("Mean Service Time (S̄) =          %.3f\n", sampleServiceTimeMean)
-// 	fmt.Printf("Mean Wait Time (W̄) =             %.3f\n", mm1k.Mean(completes, mm1k.Wait))
-// 	fmt.Printf("Analytical Wait Time (W̄) =       %.3f\n", mm1k.AnalyticalWaitTime(λ, kcpu))
-// }
+func mm1kSimulationWithReplication(seed int64) {
+	metricsListByQueue := mm1k.SimulateReplications(λ, µ, mm1k.QueueMakers[m-1], kcpu, c, replications, discard, seed)
+	mm1k.PrintMetricsListQueueMap(metricsListByQueue)
+}
 
 func mm1kSimulation(seed int64) {
 	completes, rejects := mm1k.Simulate(λ, µ, mm1k.QueueMakers[m-1](kcpu), c, seed)
