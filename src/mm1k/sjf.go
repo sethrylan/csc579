@@ -3,7 +3,6 @@ package mm1k
 import (
 	"log"
 	"math"
-	"sort"
 	"sync"
 )
 
@@ -11,7 +10,7 @@ import (
 
 // SJF implements a queue with shortest job first semantics behaviour
 type SJF struct {
-	a          []Customer
+	a          PriorityQueue
 	capacity   int
 	preemptive bool
 	lock       sync.Mutex
@@ -19,17 +18,17 @@ type SJF struct {
 
 // receives a pointer so it can modify
 func (q *SJF) push(c Customer) {
-	q.a = append(q.a, c)
+	q.a.Push(&c)
 }
 
 // receives a pointer so it can modify
 func (q *SJF) pop() (c Customer) {
-	c, q.a = q.peek(), (q.a)[1:]
+	c = *(q.a).Pop().(*Customer)
 	return
 }
 
 func (q *SJF) peek() (n Customer) {
-	n = (q.a)[0]
+	n = *(q.a).Peek().(*Customer)
 	return
 }
 
@@ -45,7 +44,7 @@ func (q *SJF) Full() bool {
 
 // NewSJF returns a reference to a new SJF
 func NewSJF(c int, preemptive bool) (sjf *SJF) {
-	return &SJF{a: make([]Customer, 0), capacity: c, preemptive: preemptive}
+	return &SJF{a: make(PriorityQueue, 0), capacity: c, preemptive: preemptive}
 }
 
 // Dequeue implements mm1k.Queue.Dequeue
@@ -66,7 +65,6 @@ func (q *SJF) Enqueue(customer Customer) (cus Customer) {
 	if q.preemptive {
 		customer.Start = customer.Arrival
 		q.push(customer)
-		sort.Sort(byService(q.a))
 	} else {
 		// NonPreemptive
 		// Compose queue so that
@@ -74,23 +72,21 @@ func (q *SJF) Enqueue(customer Customer) (cus Customer) {
 		// where a is the list customers with a startTime > cus.arrival and b is the list of remaining customers
 		// The tail (cus + [b...]) must be sorted by service time
 
-		for i := 0; i < q.Len() && customer.Start < q.a[i].Start+q.a[i].Service; i++ {
+		for i := 0; i < q.Len() && customer.Arrival < q.a[i].Start+q.a[i].Service; i++ {
 			// on last pass, i is equal to the intended position of the new customer
-			customer.Position = i
+			customer.Position = i + 1
 		}
 
 		if customer.Position == 0 {
 			customer.Start = customer.Arrival
 		}
 
-		tail := append([]Customer{customer}, q.a[customer.Position:]...)
-		sort.Sort(byService(tail))
-		q.a = append(q.a[:customer.Position], tail...)
+		q.push(customer)
 
 	}
 	// recalculate start times starting from beginning of queue
-	for i := 1; i < q.Len()-1; i++ {
-		q.a[i].Start = math.Max(q.a[i+1].Start+q.a[i+1].Service, q.a[i].Arrival)
+	for i := 1; i < q.Len(); i++ {
+		q.a[i].Start = math.Max(q.a[i-1].Start+q.a[i-1].Service, q.a[i].Arrival)
 		log.Printf("non-preempting customer %d Start to %.03f\n", q.a[i].ID, q.a[i].Start)
 	}
 
