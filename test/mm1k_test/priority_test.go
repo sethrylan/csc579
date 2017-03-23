@@ -5,61 +5,56 @@ import (
 	"mm1k"
 )
 
-func ExampleDifferentQueues() {
+func ExampleDifferentQueuesNP() {
 	var cus mm1k.Customer
-	q := mm1k.NewPriority(10, true)
-	for i := 0; i < 10; i++ {
+	var q mm1k.Queue
+	q = mm1k.NewPriority(10, 1, false)
+	for i := 0; i < 3; i++ {
 		cus = q.Enqueue(mm1k.Customer{ID: 1, Arrival: .5, Service: .1})
-		fmt.Printf("queue = %d\n", cus.PriorityQueue)
+		fmt.Printf("%v\n", cus)
 	}
+
+	fmt.Println()
+
+	q = mm1k.NewPriority(10, 1, true)
+	for i := 0; i < 3; i++ {
+		cus = q.Enqueue(mm1k.Customer{ID: 1, Arrival: .5, Service: .1})
+		fmt.Printf("%v\n", cus)
+	}
+
 	// Output:
-	//queue = 0
-	// queue = 3
-	// queue = 3
-	// queue = 1
-	// queue = 1
-	// queue = 1
-	// queue = 1
-	// queue = 0
-	// queue = 2
-	// queue = 3
+	// {1 0.5 0.1 0.5 0 0 0 0}
+	// {1 0.5 0.1 0.6 0 1 0 0}
+	// {1 0.5 0.1 0.7 0 2 0 0}
+	//
+	// {1 0.5 0.1 0.5 0 0 0 0}
+	// {1 0.5 0.1 0.6 0 1 0 0}
+	// {1 0.5 0.1 0.7 0 2 0 0}
+
 }
 
-// func ExampleNewPriority() {
-// 	// var t1 float64
-// 	var cus mm1k.Customer
-// 	q := mm1k.NewPriority(1, true)
-//
-// 	// Empty Queue
-// 	fmt.Printf("Len() = %d\n", q.Len())
-// 	fmt.Printf("NextCompletion() = %.2f\n", q.NextCompletion())
-// 	fmt.Printf("Full() = %v\n", q.Full())
-//
-// 	// Add 1 item
-// 	cus = q.Enqueue(mm1k.Customer{ID: 1, Arrival: .5, Service: .1})
-// 	fmt.Printf("pos = %d\n", cus.Position)
-// 	fmt.Printf("queue = %d\n", cus.PriorityQueue)
-// 	fmt.Printf("Len() = %d\n", q.Len())
-// 	fmt.Printf("NextCompletion() = %.2f\n", q.NextCompletion())
-// 	fmt.Printf("Full() = %v\n", q.Full())
-//
-// 	// Remove 1 item
-// 	q.Dequeue()
-// 	// fmt.Printf("customer = %v", customer)
-// 	fmt.Printf("Len() = %d\n", q.Len())
-// 	fmt.Printf("NextCompletion() = %.2f\n", q.NextCompletion())
-// 	fmt.Printf("Full() = %v\n", q.Full())
-//
-// 	// Output:
-// 	// Len() = 0
-// 	// NextCompletion() = +Inf
-// 	// Full() = false
-// 	// pos = 0
-// 	// queue = 0
-// 	// Len() = 1
-// 	// NextCompletion() = 0.60
-// 	// Full() = true
-// 	// Len() = 0
-// 	// NextCompletion() = +Inf
-// 	// Full() = false
-// }
+func ExampleDifferentQueuesNP2() {
+	var cus mm1k.Customer
+	var q mm1k.Queue
+	q = mm1k.NewPriority(10, 2, false)
+	for i := 0; i < 3; i++ {
+		cus = q.Enqueue(mm1k.Customer{ID: 1, Arrival: .5, Service: .1})
+		fmt.Printf("%v\n", cus)
+	}
+
+	fmt.Println()
+
+	q = mm1k.NewPriority(10, 2, true)
+	for i := 0; i < 3; i++ {
+		cus = q.Enqueue(mm1k.Customer{ID: 1, Arrival: .5, Service: .1})
+		fmt.Printf("%v\n", cus)
+	}
+	// Output:
+	// {1 0.5 0.1 0.5 0 0 0 0}
+	// {1 0.5 0.1 0.6 0 0 0 1}
+	// {1 0.5 0.1 0.7 0 1 0 1}
+	//
+	// {1 0.5 0.1 0.5 0 0 0 0}
+	// {1 0.5 0.1 0.6 0 0 0 1}
+	// {1 0.5 0.1 0.7 0 1 0 1}
+}

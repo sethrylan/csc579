@@ -116,12 +116,12 @@ func replication(wg *sync.WaitGroup, i int, ρ float64, µ float64, queue Queue,
 	}
 
 	metricsListByQueue := make(SimMetricsList, len(completesByQueue))
-	for k := range completesByQueue {
-		metricsListByQueue[k].w = Mean(completesByQueue[k], Wait)
-		metricsListByQueue[k].s = Mean(completesByQueue[k], Service)
-		sort.Sort(byDeparture(completesByQueue[k]))
-		metricsListByQueue[k].lastDeparture = completesByQueue[k][len(completesByQueue[k])-1].Departure
-		metricsListByQueue[k].clr = EmpiricalCLR(len(rejectsByQueue[k]), len(rejectsByQueue[k])+len(completesByQueue[k]))
+	for k, completes := range completesByQueue {
+		metricsListByQueue[k].w = Mean(completes, Wait)
+		metricsListByQueue[k].s = Mean(completes, Service)
+		sort.Sort(byDeparture(completes))
+		metricsListByQueue[k].lastDeparture = completes[len(completes)-1].Departure
+		metricsListByQueue[k].clr = EmpiricalCLR(len(rejectsByQueue[k]), len(rejectsByQueue[k])+len(completes))
 	}
 	ch <- metricsListByQueue
 	return
@@ -272,9 +272,9 @@ func sjf(K int) Queue {
 }
 
 func prioNP(K int) Queue {
-	return NewPriority(K, false)
+	return NewPriority(K, 4, false)
 }
 
 func prioP(K int) Queue {
-	return NewPriority(K, true)
+	return NewPriority(K, 4, true)
 }
