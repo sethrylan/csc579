@@ -10,7 +10,7 @@ func ExampleDifferentQueuesNP() {
 	var q mm1k.Queue
 	q = mm1k.NewPriority(10, 1, false)
 	for i := 0; i < 3; i++ {
-		cus = q.Enqueue(mm1k.Customer{ID: 1, Arrival: .5, Service: .1})
+		cus = q.Enqueue(mm1k.Customer{ID: i, Arrival: .5, Service: .1})
 		fmt.Printf("%v\n", cus)
 	}
 
@@ -18,18 +18,18 @@ func ExampleDifferentQueuesNP() {
 
 	q = mm1k.NewPriority(10, 1, true)
 	for i := 0; i < 3; i++ {
-		cus = q.Enqueue(mm1k.Customer{ID: 1, Arrival: .5, Service: .1})
+		cus = q.Enqueue(mm1k.Customer{ID: i, Arrival: .5, Service: .1})
 		fmt.Printf("%v\n", cus)
 	}
 
 	// Output:
-	// {1 0.5 0.1 0.5 0 0 0 0}
+	// {0 0.5 0.1 0.5 0 0 0 0}
 	// {1 0.5 0.1 0.6 0 1 0 0}
-	// {1 0.5 0.1 0.7 0 2 0 0}
+	// {2 0.5 0.1 0.7 0 2 0 0}
 	//
-	// {1 0.5 0.1 0.5 0 0 0 0}
+	// {0 0.5 0.1 0.5 0 0 0 0}
 	// {1 0.5 0.1 0.6 0 1 0 0}
-	// {1 0.5 0.1 0.7 0 2 0 0}
+	// {2 0.5 0.1 0.7 0 2 0 0}
 
 }
 
@@ -38,7 +38,7 @@ func ExampleDifferentQueuesNP2() {
 	var q mm1k.Queue
 	q = mm1k.NewPriority(10, 2, false)
 	for i := 0; i < 3; i++ {
-		cus = q.Enqueue(mm1k.Customer{ID: 1, Arrival: .5, Service: .1})
+		cus = q.Enqueue(mm1k.Customer{ID: i, Arrival: .5, Service: .1})
 		fmt.Printf("%v\n", cus)
 	}
 
@@ -46,15 +46,15 @@ func ExampleDifferentQueuesNP2() {
 
 	q = mm1k.NewPriority(10, 2, true)
 	for i := 0; i < 3; i++ {
-		cus = q.Enqueue(mm1k.Customer{ID: 1, Arrival: .5, Service: .1})
+		cus = q.Enqueue(mm1k.Customer{ID: i, Arrival: .5, Service: .1})
 		fmt.Printf("%v\n", cus)
 	}
 	// Output:
-	// {1 0.5 0.1 0.5 0 0 0 0}
+	// {0 0.5 0.1 0.5 0 0 0 0}
 	// {1 0.5 0.1 0.6 0 0 0 1}
-	// {1 0.5 0.1 0.7 0 1 0 1}
+	// {2 0.5 0.1 0.7 0 1 0 1}
 	//
-	// {1 0.5 0.1 0.5 0 0 0 0}
+	// {0 0.5 0.1 0.5 0 0 0 0}
 	// {1 0.5 0.1 0.6 0 0 0 1}
-	// {1 0.5 0.1 0.7 0 1 0 1}
+	// {2 0.5 0.1 0.7 0 1 0 1}
 }
