@@ -81,7 +81,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	mm1k.P2Question2(replications, seed)
+	mm1k.P2Question1(replications, seed)
 }
 
 // P2 implementation
