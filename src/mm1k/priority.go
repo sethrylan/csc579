@@ -88,22 +88,18 @@ func (q *Priority) Enqueue(customer Customer) (cus Customer) {
 	customer = q.a[q.next].enqueue(customer, q.last(q.next))
 	// fmt.Printf("customer.Start = %f\n", customer.Start)
 
-	if q.preemptive {
-
-	} else {
-		var lastCompletion float64
-		// recalculate start times of lower priority queues
-		for i := 0; i < q.p-1; i++ { // For each lower priority queue,
-			if q.a[i].Len() > 0 {
-				lastCompletion = q.a[i].last().Start + q.a[i].last().Service // find the last completion for queue i
-				// fmt.Printf("lastCompletion = %f\n", lastCompletion)
-			}
-			if q.a[i+1].Len() > 0 { // if the queue has items
-				firstStart := q.a[i+1].peek().Start
-				if firstStart < lastCompletion { // and first start in queue is before lastCompletion in higher priority queue
-					for j := 0; j < q.a[i+1].Len(); j++ { // then for all al
-						q.a[i+1].a[j].Start += lastCompletion - firstStart
-					}
+	var lastCompletion float64
+	// recalculate start times of lower priority queues
+	for i := 0; i < q.p-1; i++ { // For each lower priority queue,
+		if q.a[i].Len() > 0 {
+			lastCompletion = q.a[i].last().Start + q.a[i].last().Service // find the last completion for queue i
+			// fmt.Printf("lastCompletion = %f\n", lastCompletion)
+		}
+		if q.a[i+1].Len() > 0 { // if the queue has items
+			firstStart := q.a[i+1].peek().Start
+			if q.preemptive && firstStart < lastCompletion { // and first start in queue is before lastCompletion in higher priority queue
+				for j := 0; j < q.a[i+1].Len(); j++ { // then for all al
+					q.a[i+1].a[j].Start += lastCompletion - firstStart
 				}
 			}
 		}

@@ -7,6 +7,8 @@ import (
 )
 
 // LIFO stack implementation
+// See notes on non-preemption at http://pages.cs.wisc.edu/~dsmyers/cs547/lecture_17_scheduling.pdf
+// 			Average wait is "is exactly the waiting time in an M/G/1-FCFS queue."
 
 // LIFO implements a stack with last-in-first-out behaviour
 type LIFO struct {

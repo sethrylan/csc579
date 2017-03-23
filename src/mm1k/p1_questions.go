@@ -80,7 +80,7 @@ func P1Question5(seed int64) {
 	C := 100000
 	for ρ := 0.05; ρ <= 0.95; ρ += 0.10 {
 		func() {
-			defer timeTrack(time.Now(), fmt.Sprintf("\nρ = %.2f", ρ))
+			defer timeTrack(time.Now(), fmt.Sprintf("\nρ = %.2f took ", ρ))
 			Simulate(ρ, 1.0, NewFIFO(K), C, seed)
 		}()
 	}

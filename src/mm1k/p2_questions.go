@@ -22,7 +22,7 @@ func P2Question1(replications int, seed int64) {
 	C := 100000
 	for ρ := 0.05; ρ <= 0.95; ρ += 0.10 {
 		for _, makerFunc := range QueueMakers {
-			fmt.Printf("\n%s %f, %d, %d | ", GetFunctionName(makerFunc), ρ, K, C)
+			fmt.Printf("\n%s ρ=%f, K=%d, C=%d | ", GetFunctionName(makerFunc), ρ, K, C)
 			metricsByQueue := SimulateReplications(ρ, µ, makerFunc, K, C, replications, discard, seed)
 			PrintMetricsListQueueMap(metricsByQueue)
 		}
@@ -34,13 +34,20 @@ func P2Question2(replications int, seed int64) {
 	K := 20
 	C := 1000000
 	for ρ := 0.05; ρ <= 0.95; ρ += 0.10 {
+		fmt.Printf("\nρ=%f, K=%d, C=%d (", ρ, K, C)
 		for _, makerFunc := range QueueMakers {
-			fmt.Printf("\n%s %f, %d, %d | ", GetFunctionName(makerFunc), ρ, K, C)
+			fmt.Printf("%s ", GetFunctionName(makerFunc))
+		}
+		fmt.Printf("\b) : ")
+
+		for _, makerFunc := range QueueMakers {
+			// fmt.Printf("\n%s %f, %d, %d | ", GetFunctionName(makerFunc), ρ, K, C)
 			func() {
-				defer timeTrack(time.Now(), "")
+				defer timeTrack(time.Now(), "\t")
 				// SimulateReplications(ρ, µ, makerFunc, K, C, replications, discard, seed)
 				Simulate(ρ, 1.0, makerFunc(K), C, seed)
 			}()
 		}
 	}
+	fmt.Println()
 }
