@@ -31,6 +31,15 @@ func (q *FIFO) peek() (n Customer) {
 	return
 }
 
+func (q *FIFO) last() (n Customer) {
+	if len(q.a) > 0 {
+		n = (q.a)[len(q.a)-1]
+	} else {
+		n = Customer{}
+	}
+	return
+}
+
 // Len implements mm1k.Queue.Len
 func (q *FIFO) Len() int {
 	return len(q.a)
@@ -55,14 +64,18 @@ func (q *FIFO) Dequeue() (c Customer) {
 
 // Enqueue implements mm1k.Queue.Enqueue
 func (q *FIFO) Enqueue(customer Customer) (cus Customer) {
+	return q.enqueue(customer, q.last())
+}
+
+func (q *FIFO) enqueue(customer Customer, last Customer) (cus Customer) {
 	q.lock.Lock()
 	defer q.lock.Unlock()
 	if q.Full() {
 		log.Panicln("queue is full")
 	}
 	customer.Position = q.Len()
-	if q.Len() > 0 {
-		customer.Start = math.Max(q.a[q.Len()-1].Start+q.a[q.Len()-1].Service, customer.Arrival)
+	if last != (Customer{}) {
+		customer.Start = math.Max(last.Start+last.Service, customer.Arrival)
 	} else {
 		customer.Start = customer.Arrival
 	}
