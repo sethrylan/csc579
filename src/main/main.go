@@ -16,7 +16,7 @@ var kcpu, kio, c, l, m int
 
 const seed int64 = 42
 const discard int = 1000
-const replications int = 30
+const replications int = 1
 
 const usageMsg string = "λ K C L\n" +
 	"λ = distribution of interarrival times\n" +
@@ -81,11 +81,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	mm1k.P2Question1(replications, seed)
+	// mm1k.P2Question1(replications, seed)
 }
 
 // P2 implementation
 func mm1kSimulationWithReplication(seed int64) {
+	fmt.Printf("====== %s ======\n", mm1k.GetFunctionName(mm1k.QueueMakers[m-1]))
 	metricsListByQueue := mm1k.SimulateReplications(λ, µ, mm1k.QueueMakers[m-1], kcpu, c, replications, discard, seed)
 	mm1k.PrintMetricsListQueueMap(metricsListByQueue)
 }

@@ -106,7 +106,7 @@ func getType(myvar interface{}) (s string) {
 	return
 }
 
-func getFunctionName(i interface{}) string {
+func GetFunctionName(i interface{}) string {
 	name := runtime.FuncForPC(reflect.ValueOf(i).Pointer()).Name()
 	return name[strings.LastIndex(name, ".")+1:]
 }
