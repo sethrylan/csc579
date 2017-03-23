@@ -58,6 +58,11 @@ func Departure(c Customer) float64 {
 	return c.Departure - c.Arrival
 }
 
+// System is a field for sorting customer.
+func System(c Customer) float64 {
+	return c.Departure - c.Arrival
+}
+
 // A Queue type defines the common operations for a service queue
 type Queue interface {
 	// Enqueue adds customer to the queue
@@ -117,8 +122,8 @@ func replication(wg *sync.WaitGroup, i int, ρ float64, µ float64, queue Queue,
 
 	metricsListByQueue := make(SimMetricsList, len(completesByQueue))
 	for k, completes := range completesByQueue {
-		metricsListByQueue[k].w = Mean(completes, Wait)
-		metricsListByQueue[k].s = Mean(completes, Service)
+		metricsListByQueue[k].wait = Mean(completes, Wait)
+		metricsListByQueue[k].system = Mean(completes, System)
 		sort.Sort(byDeparture(completes))
 		metricsListByQueue[k].lastDeparture = completes[len(completes)-1].Departure
 		metricsListByQueue[k].clr = EmpiricalCLR(len(rejectsByQueue[k]), len(rejectsByQueue[k])+len(completes))
@@ -230,7 +235,7 @@ func PrintMetricsListQueueMap(metricsListByQueue map[int]SimMetricsList) {
 	for _, k := range keys {
 		sampleMean, sampleStdDev = metricsListByQueue[k].MeanAndStdDev(AverageWait)
 		if k == 0 {
-			fmt.Printf("W̄            =")
+			fmt.Printf("W̄ait         =")
 		}
 		fmt.Printf(" %.3f±%.3f", sampleMean, sampleStdDev*2) // Print 95% confidence interval
 
@@ -238,9 +243,9 @@ func PrintMetricsListQueueMap(metricsListByQueue map[int]SimMetricsList) {
 	fmt.Println()
 
 	for _, k := range keys {
-		sampleMean, sampleStdDev = metricsListByQueue[k].MeanAndStdDev(AverageService)
+		sampleMean, sampleStdDev = metricsListByQueue[k].MeanAndStdDev(AverageSystem)
 		if k == 0 {
-			fmt.Printf("S̄            =")
+			fmt.Printf("S̄ystem       =")
 		}
 		fmt.Printf(" %.3f±%.3f", sampleMean, sampleStdDev*2) // Print 95% confidence interval
 	}

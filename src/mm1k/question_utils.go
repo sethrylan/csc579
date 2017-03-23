@@ -11,8 +11,8 @@ import (
 )
 
 type SimMetrics struct {
-	w             float64
-	s             float64
+	wait          float64
+	system        float64
 	lastDeparture float64
 	clr           float64
 }
@@ -20,11 +20,11 @@ type SimMetrics struct {
 type SimMetricsList []SimMetrics
 
 func AverageWait(m SimMetrics) float64 {
-	return m.w
+	return m.wait
 }
 
-func AverageService(m SimMetrics) float64 {
-	return m.s
+func AverageSystem(m SimMetrics) float64 {
+	return m.system
 }
 
 func CLR(m SimMetrics) float64 {
