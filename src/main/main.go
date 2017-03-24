@@ -46,7 +46,7 @@ func init() {
 
 	µ = 1.0
 	µcpu = 1.0
-	µio = 0.7
+	µio = 0.5
 
 	log.SetFlags(log.Lshortfile)
 	if *debugPtr {
@@ -57,19 +57,6 @@ func init() {
 }
 
 func main() {
-	fmt.Printf("λ =    %.3f\n", λ)
-	fmt.Printf("µcpu =    %.3f\n", µcpu)
-	fmt.Printf("µio =    %.3f\n", µio)
-	fmt.Printf("Kcpu =    %d\n", kcpu)
-	fmt.Printf("Kio =    %d\n", kio)
-	fmt.Printf("C =    %d\n", c)
-	fmt.Printf("L =    %d\n", l)
-
-	if m > 5 || m < 1 {
-		fmt.Printf("usage: %s %s\n", os.Args[0], usageMsg)
-		os.Exit(1)
-	}
-
 	switch l {
 	case 1:
 		if c <= discard {
@@ -89,6 +76,17 @@ func main() {
 
 // P2 implementation
 func mm1kSimulationWithReplication(seed int64) {
+	fmt.Printf("======= Running m/m/1/k Simulation =======\n")
+	if m > 5 || m < 1 {
+		fmt.Printf("usage: %s %s\n", os.Args[0], usageMsg)
+		os.Exit(1)
+	}
+	fmt.Printf("λ =     %.3f\n", λ)
+	fmt.Printf("µ =     %.3f\n", µcpu)
+	fmt.Printf("K =     %d\n", kcpu)
+	fmt.Printf("C =     %d\n", c)
+	fmt.Printf("L =     %d\n", l)
+	fmt.Printf("M =     %s\n", mm1k.GetFunctionName(mm1k.QueueMakers[m-1]))
 	fmt.Printf("%s ", mm1k.GetFunctionName(mm1k.QueueMakers[m-1]))
 	metricsListByQueue := mm1k.SimulateReplications(λ, µ, mm1k.QueueMakers[m-1], kcpu, c, replications, discard, seed)
 	mm1k.PrintMetricsListQueueMap(metricsListByQueue)
@@ -96,6 +94,15 @@ func mm1kSimulationWithReplication(seed int64) {
 
 // P2 implementation
 func cpuSimulation(seed int64) {
+	fmt.Printf("======= Running CPU/IO Simulation =======\n")
+	fmt.Printf("λ =     %.3f\n", λ)
+	fmt.Printf("µcpu =  %.3f\n", µcpu)
+	fmt.Printf("µio =   %.3f\n", µio)
+	fmt.Printf("Kcpu =  %d\n", kcpu)
+	fmt.Printf("Kio =   %d\n", kio)
+	fmt.Printf("C =     %d\n", c)
+	fmt.Printf("L =     %d\n", l)
+
 	completes, rejects, exits := mm1k.SimulateCPU(λ, []float64{µcpu, µio, µio, µio}, []mm1k.Queue{mm1k.NewFIFO(kcpu), mm1k.NewFIFO(kio), mm1k.NewFIFO(kio), mm1k.NewFIFO(kio)}, c, seed)
 	sorted := append(rejects, exits...)
 	sort.Sort(mm1k.ByID(sorted))
