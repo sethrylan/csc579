@@ -183,9 +183,7 @@ func Run(arrivalDistribution Distribution, q Queue, serviceDistribution Distribu
 				}
 				id++
 				t1 = clock + arrivalDistribution.Get() // Set t1 to time of next arrival.
-				// if q.Len() > 0 {                       // If queue is not empty
-				t2 = q.NextCompletion() // then set t2 to time of next completion.
-				// }
+				t2 = q.NextCompletion()                // then set t2 to time of next completion.
 			} else { // If next arrival is after next completion -> Event: Departure
 				if !math.IsInf(t2, 1) { // if next completion exists
 					clock = t2                             // Set time to time of next completion.
