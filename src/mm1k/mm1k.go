@@ -103,10 +103,10 @@ func SimulateReplications(λ float64, µ float64, makerFunc func(int) Queue, K i
 }
 
 // Yield the metrics per queue (after discard)
-func replication(wg *sync.WaitGroup, i int, ρ float64, µ float64, queue Queue, C int, seed int64, ch chan<- SimMetricsList) {
+func replication(wg *sync.WaitGroup, i int, λ float64, µ float64, queue Queue, C int, seed int64, ch chan<- SimMetricsList) {
 	defer wg.Done()
 	defer fmt.Printf(".")
-	completes, rejects := Simulate(ρ, µ, queue, C, seed+int64(i))
+	completes, rejects := Simulate(λ, µ, queue, C, seed+int64(i))
 	completes = RemoveFirstNByDeparture(completes, discard)
 
 	completesByQueue := make(map[int][]Customer)
