@@ -3,8 +3,11 @@ package mm1k
 import (
 	"math"
 	"math/rand"
+	"fmt"
+	"log"
 )
 
+// Return earliest NextCompletion for the list of queues
 func nextCompletion(queues []Queue) (nextQueue int, nextCompletion float64) {
 	nextCompletion = math.Inf(1)
 	nextQueue = -1
@@ -13,6 +16,7 @@ func nextCompletion(queues []Queue) (nextQueue int, nextCompletion float64) {
 			nextQueue, nextCompletion = i, q.NextCompletion()
 		}
 	}
+	log.Printf("nextQueue, nextCompletion = %d, %.3f\n", nextQueue, nextCompletion)
 	return
 }
 
@@ -69,6 +73,8 @@ func RunCPUIo(arrivalDistribution Distribution, q []Queue, serviceDistributions 
 							q[2].Enqueue(customer)
 						case r > queueTransitionProbabilities[2] && r <= queueTransitionProbabilities[3]:
 							q[3].Enqueue(customer)
+						default:
+							fmt.Printf("should never happen\n")
 						}
 					}
 				}
@@ -79,6 +85,7 @@ func RunCPUIo(arrivalDistribution Distribution, q []Queue, serviceDistributions 
 
 	rejects = rejected
 	completes = completed
+	exits = exited
 	return
 }
 
@@ -104,7 +111,7 @@ func SimulateCPU(λ float64, µcpu float64, µio float64, queues []Queue, C int,
 		serviceDistributions,
 		transitions,
 	)
-	for len(completes) < C {
+	for len(exits) < C {
 		select {
 		case customer = <-rejected:
 			rejects = append(rejects, customer)

@@ -74,7 +74,7 @@ func main() {
 		}
 		mm1kSimulationWithReplication(seed)
 	case 2:
-		// TODO:
+		cpuSimulation(seed)
 		os.Exit(1)
 	default:
 		fmt.Printf("usage: %s %s\n", os.Args[0], usageMsg)
@@ -89,6 +89,29 @@ func mm1kSimulationWithReplication(seed int64) {
 	fmt.Printf("%s ", mm1k.GetFunctionName(mm1k.QueueMakers[m-1]))
 	metricsListByQueue := mm1k.SimulateReplications(λ, µ, mm1k.QueueMakers[m-1], kcpu, c, replications, discard, seed)
 	mm1k.PrintMetricsListQueueMap(metricsListByQueue)
+}
+
+// P2 implementation
+func cpuSimulation(seed int64) {
+	completes, rejects, exits := mm1k.SimulateCPU(λ, 1, 0.5, []mm1k.Queue{mm1k.NewFIFO(kcpu), mm1k.NewFIFO(kio), mm1k.NewFIFO(kio), mm1k.NewFIFO(kio)}, c, seed)
+	sorted := append(rejects, exits...)
+	sort.Sort(mm1k.ByID(sorted))
+	totalEvents := sorted[len(sorted)-1].ID + 1
+	sampleServiceTimeMean := mm1k.Mean(completes, mm1k.Service)
+
+	fmt.Printf("Master clock =                   %.3f\n", completes[len(completes)-1].Departure)
+	fmt.Printf("CLR (Analytical) =               %.3f\n", mm1k.AnalyticalCLR(λ, kcpu))
+	fmt.Printf("CLR (Empirical; X/N = %d/%d) =   %.3f\n", len(rejects), totalEvents, mm1k.EmpiricalCLR(len(rejects), totalEvents))
+	fmt.Printf("Mean Service Time (S̄) =          %.3f\n", sampleServiceTimeMean)
+	fmt.Printf("Mean Wait Time (W̄) =             %.3f\n", mm1k.Mean(completes, mm1k.Wait))
+	fmt.Printf("Analytical Wait Time (W̄) =       %.3f\n", mm1k.AnalyticalWaitTime(λ, kcpu))
+
+	for _, customer := range sorted {
+		// L, L + 1, L + 10, and L + 11
+		if customer.ID == l || customer.ID == l+1 || customer.ID == l+10 || customer.ID == l+11 {
+			mm1k.PrintCustomer(customer)
+		}
+	}
 }
 
 // P1 implementation
