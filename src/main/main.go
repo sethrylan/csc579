@@ -11,7 +11,7 @@ import (
 	"strconv"
 )
 
-var λ, µ float64
+var λ, µ, µcpu, µio float64
 var kcpu, kio, c, l, m int
 
 const seed int64 = 42
@@ -45,6 +45,8 @@ func init() {
 	m, _ = strconv.Atoi(args[5])
 
 	µ = 1.0
+	µcpu = 1.0
+	µio = 0.7
 
 	log.SetFlags(log.Lshortfile)
 	if *debugPtr {
@@ -56,9 +58,10 @@ func init() {
 
 func main() {
 	fmt.Printf("λ =    %.3f\n", λ)
-	fmt.Printf("µ =    %.3f\n", µ)
+	fmt.Printf("µcpu =    %.3f\n", µcpu)
+	fmt.Printf("µio =    %.3f\n", µio)
 	fmt.Printf("Kcpu =    %d\n", kcpu)
-	fmt.Printf("Kcpu =    %d\n", kio)
+	fmt.Printf("Kio =    %d\n", kio)
 	fmt.Printf("C =    %d\n", c)
 	fmt.Printf("L =    %d\n", l)
 
@@ -93,7 +96,7 @@ func mm1kSimulationWithReplication(seed int64) {
 
 // P2 implementation
 func cpuSimulation(seed int64) {
-	completes, rejects, exits := mm1k.SimulateCPU(λ, 1, 0.5, []mm1k.Queue{mm1k.NewFIFO(kcpu), mm1k.NewFIFO(kio), mm1k.NewFIFO(kio), mm1k.NewFIFO(kio)}, c, seed)
+	completes, rejects, exits := mm1k.SimulateCPU(λ, []float64{µcpu, µio, µio, µio}, []mm1k.Queue{mm1k.NewFIFO(kcpu), mm1k.NewFIFO(kio), mm1k.NewFIFO(kio), mm1k.NewFIFO(kio)}, c, seed)
 	sorted := append(rejects, exits...)
 	sort.Sort(mm1k.ByID(sorted))
 	totalEvents := sorted[len(sorted)-1].ID + 1

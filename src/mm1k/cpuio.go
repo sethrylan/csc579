@@ -1,10 +1,9 @@
 package mm1k
 
 import (
+	"log"
 	"math"
 	"math/rand"
-	"fmt"
-	"log"
 )
 
 // Return earliest NextCompletion for the list of queues
@@ -23,7 +22,7 @@ func nextCompletion(queues []Queue) (nextQueue int, nextCompletion float64) {
 // RunCPUIo will continually add and service customers using an event loop. At time
 // t = 0 the system is empty. Draw a random number to decide when the
 // first arrival will occur.
-func RunCPUIo(arrivalDistribution Distribution, q []Queue, serviceDistributions []Distribution, queueTransitionProbabilities map[int]float64) (rejects, completes, exits <-chan Customer) {
+func RunCPUIo(arrivalDistribution Distribution, q []Queue, serviceDistributions []Distribution, qProbabilities map[int]float64) (rejects, completes, exits <-chan Customer) {
 	rejected := make(chan Customer)  // Unbuffered channels ensure deterministic simulation
 	completed := make(chan Customer) //
 	exited := make(chan Customer)    //
@@ -64,17 +63,18 @@ func RunCPUIo(arrivalDistribution Distribution, q []Queue, serviceDistributions 
 						q[0].Enqueue(customer)
 					} else {
 						r := rand.Float64()
-						switch {
-						case r <= queueTransitionProbabilities[0]:
+						if r <= qProbabilities[0] {
 							exited <- customer
-						case r > queueTransitionProbabilities[0] && r <= queueTransitionProbabilities[1]:
-							q[1].Enqueue(customer)
-						case r > queueTransitionProbabilities[1] && r <= queueTransitionProbabilities[2]:
-							q[2].Enqueue(customer)
-						case r > queueTransitionProbabilities[2] && r <= queueTransitionProbabilities[3]:
-							q[3].Enqueue(customer)
-						default:
-							fmt.Printf("should never happen\n")
+						} else {
+							for i := 0; i < len(qProbabilities)-1; i++ {
+								if r > qProbabilities[i] && r <= qProbabilities[i+1] {
+									if q[i+1].Full() {
+										// TODO: reject
+									} else {
+										q[i+1].Enqueue(customer)
+									}
+								}
+							}
 						}
 					}
 				}
@@ -90,19 +90,18 @@ func RunCPUIo(arrivalDistribution Distribution, q []Queue, serviceDistributions 
 }
 
 // Simulate will terminate once C customers have completed.
-func SimulateCPU(λ float64, µcpu float64, µio float64, queues []Queue, C int, seed int64) (completes []Customer, rejects []Customer, exits []Customer) {
+func SimulateCPU(λ float64, µs []float64, queues []Queue, C int, seed int64) (completes []Customer, rejects []Customer, exits []Customer) {
 	transitions := map[int]float64{
 		0: 0.7,
 		1: 0.8,
 		2: 0.9,
 		3: 1.0,
 	}
-	serviceDistributions := []Distribution{
-		NewExpDistribution(µcpu, seed+1),
-		NewExpDistribution(µio, seed+1),
-		NewExpDistribution(µio, seed+1),
-		NewExpDistribution(µio, seed+1),
+	serviceDistributions := []Distribution{}
+	for i, µ := range µs {
+		serviceDistributions = append(serviceDistributions, NewExpDistribution(µ, seed+int64(i)+1))
 	}
+
 	var customer Customer
 	var rejected, completed, exited <-chan Customer
 	rejected, completed, exited = RunCPUIo(
