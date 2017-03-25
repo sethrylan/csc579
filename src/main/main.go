@@ -126,7 +126,7 @@ func cpuSimulation(seed int64) {
 
 // P1 implementation
 func mm1kSimulation(seed int64) {
-	completes, rejects := mm1k.Simulate(λ, µ, mm1k.QueueMakers[m-1](kcpu), c, seed)
+	rejects, completes := mm1k.Simulate(λ, µ, mm1k.QueueMakers[m-1](kcpu), c, seed)
 	sorted := append(rejects, completes...)
 	sort.Sort(mm1k.ByID(sorted))
 	totalEvents := sorted[len(sorted)-1].ID + 1

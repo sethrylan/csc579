@@ -106,7 +106,7 @@ func SimulateReplications(λ float64, µ float64, makerFunc func(int) Queue, K i
 func replication(wg *sync.WaitGroup, i int, λ float64, µ float64, queue Queue, C int, seed int64, ch chan<- SimMetricsList) {
 	defer wg.Done()
 	defer fmt.Printf(".")
-	completes, rejects := Simulate(λ, µ, queue, C, seed+int64(i))
+	rejects, completes := Simulate(λ, µ, queue, C, seed+int64(i))
 	completes = RemoveFirstNByDeparture(completes, discard)
 
 	completesByQueue := make(map[int][]Customer)
@@ -133,7 +133,7 @@ func replication(wg *sync.WaitGroup, i int, λ float64, µ float64, queue Queue,
 }
 
 // Simulate will terminate once C customers have completed.
-func Simulate(λ float64, µ float64, q Queue, C int, seed int64) (completes []Customer, rejects []Customer) {
+func Simulate(λ float64, µ float64, q Queue, C int, seed int64) (rejects []Customer, completes []Customer) {
 	var customer Customer
 	var rejected, completed <-chan Customer
 	rejected, completed = Run(

@@ -34,7 +34,7 @@ var simTests = []struct {
 func TestSimulate(t *testing.T) {
 	log.SetOutput(ioutil.Discard)
 	for _, tt := range simTests {
-		completes, rejects := mm1k.Simulate(tt.λ, tt.µ, mm1k.NewFIFO(tt.k), tt.c, tt.seed)
+		rejects, completes := mm1k.Simulate(tt.λ, tt.µ, mm1k.NewFIFO(tt.k), tt.c, tt.seed)
 
 		if len(completes) != tt.c {
 			t.Errorf("Expected %d completes, got %d", tt.c, len(completes))
