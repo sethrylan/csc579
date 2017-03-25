@@ -1,9 +1,12 @@
 package mm1k
 
 import (
+	"fmt"
 	"log"
 	"math"
 	"math/rand"
+	"sort"
+	"sync"
 )
 
 // Return earliest NextCompletion for the list of queues
@@ -19,10 +22,50 @@ func nextCompletion(queues []Queue) (nextQueue int, nextCompletion float64) {
 	return
 }
 
-// RunCPUIo will continually add and service customers using an event loop. At time
+// Yield the metrics per queue (after discard)
+func replicationCPUIO(wg *sync.WaitGroup, i int, λ float64, µs []float64, Ks []int, c int, seed int64, ch chan<- SimMetricsList) {
+	defer wg.Done()
+	defer fmt.Printf(".")
+	queues := []Queue{}
+	for _, k := range Ks {
+		queues = append(queues, NewFIFO(k))
+	}
+
+	rejects, completes, exits := SimulateCPUIO(λ, µs, queues, c, seed)
+	completes = RemoveFirstNByDeparture(completes, discard)
+
+	completesByQueue := make(map[int][]Customer)
+	rejectsByQueue := make(map[int][]Customer)
+	exitsByQueue := make(map[int][]Customer)
+
+	for _, c := range completes {
+		completesByQueue[c.PriorityQueue] = append(completesByQueue[c.PriorityQueue], c)
+	}
+
+	for _, c := range rejects {
+		rejectsByQueue[c.PriorityQueue] = append(rejectsByQueue[c.PriorityQueue], c)
+	}
+
+	for _, c := range exits {
+		exitsByQueue[c.PriorityQueue] = append(exitsByQueue[c.PriorityQueue], c)
+	}
+
+	metricsListByQueue := make(SimMetricsList, len(completesByQueue))
+	for k, completes := range completesByQueue {
+		metricsListByQueue[k].wait = Mean(completes, Wait)
+		metricsListByQueue[k].system = Mean(completes, System)
+		sort.Sort(byDeparture(completes))
+		metricsListByQueue[k].lastDeparture = completes[len(completes)-1].Departure
+		metricsListByQueue[k].clr = EmpiricalCLR(len(rejectsByQueue[k]), len(rejectsByQueue[k])+len(completes))
+	}
+	ch <- metricsListByQueue
+	return
+}
+
+// RunCPUIO will continually add and service customers using an event loop. At time
 // t = 0 the system is empty. Draw a random number to decide when the
 // first arrival will occur.
-func RunCPUIo(arrivalDistribution Distribution, q []Queue, serviceDistributions []Distribution, qProbabilities map[int]float64) (rejects, completes, exits <-chan Customer) {
+func RunCPUIO(arrivalDistribution Distribution, queues []Queue, serviceDistributions []Distribution, qProbabilities map[int]float64) (rejects, completes, exits <-chan Customer) {
 	rejected := make(chan Customer)  // Unbuffered channels ensure deterministic simulation
 	completed := make(chan Customer) //
 	exited := make(chan Customer)    //
@@ -36,49 +79,59 @@ func RunCPUIo(arrivalDistribution Distribution, q []Queue, serviceDistributions 
 		for {                              // Do forever
 			if t1 < t2 { // If next arrival is before next completion -> Event: Arrival
 				clock = t1 // Set clock to time of next arrival.
-				if q[0].Full() {
+				if queues[0].Full() {
 					rejected <- Customer{ID: id,
 						Arrival:          t1,
 						Service:          serviceDistributions[0].Get(),
 						Departure:        t1,
-						QueueAtDeparture: q[0].Len(),
-						Position:         -1}
+						QueueAtDeparture: queues[0].Len(),
+						Position:         -1,
+						PriorityQueue:    0}
 				} else {
-					q[0].Enqueue(Customer{ID: id,
-						Arrival: t1,
-						Service: serviceDistributions[0].Get()})
+					queues[0].Enqueue(Customer{ID: id,
+						Arrival:       t1,
+						Service:       serviceDistributions[0].Get(),
+						PriorityQueue: 0})
 				}
 				id++
 				t1 = clock + arrivalDistribution.Get() // Set t1 to time of next arrival.
-				t2q, t2 = nextCompletion(q)            // then set t2 to time of next completion.
+				t2q, t2 = nextCompletion(queues)       // then set t2 to time of next completion.
 			} else { // If next arrival is after next completion -> Event: Departure
 				if !math.IsInf(t2, 1) { // if next completion exists
-					clock = t2                               // Set time to time of next completion.
-					customer := q[t2q].Dequeue()             // Remove customer from queue
-					customer.Departure = t2                  // Set completion time
-					customer.QueueAtDeparture = q[t2q].Len() // Set queue size
-					customer.Start = t2 - customer.Service   // and start time
-					completed <- customer                    // and add the customer to the completed channel
+					clock = t2                                    // Set time to time of next completion.
+					customer := queues[t2q].Dequeue()             // Remove customer from queue
+					customer.Departure = t2                       // Set completion time
+					customer.QueueAtDeparture = queues[t2q].Len() // Set queue size
+					customer.Start = t2 - customer.Service        // and start time
+					completed <- customer                         // and add the customer to the completed channel
 					if t2q >= 1 {
-						q[0].Enqueue(customer)
+						customer.PriorityQueue = 0
+						if queues[0].Full() {
+							rejected <- customer
+						} else {
+							queues[0].Enqueue(customer)
+						}
 					} else {
 						r := rand.Float64()
 						if r <= qProbabilities[0] {
+							customer.PriorityQueue = 0
 							exited <- customer
 						} else {
 							for i := 0; i < len(qProbabilities)-1; i++ {
 								if r > qProbabilities[i] && r <= qProbabilities[i+1] {
-									if q[i+1].Full() {
-										// TODO: reject
+									customer.PriorityQueue = i + 1
+									if queues[i+1].Full() {
+										rejected <- customer
 									} else {
-										q[i+1].Enqueue(customer)
+										customer.Service = serviceDistributions[i+1].Get()
+										queues[i+1].Enqueue(customer)
 									}
 								}
 							}
 						}
 					}
 				}
-				t2q, t2 = nextCompletion(q) // then set t2 to time of next completion.
+				t2q, t2 = nextCompletion(queues) // then set t2 to time of next completion.
 			}
 		}
 	}()
@@ -90,7 +143,7 @@ func RunCPUIo(arrivalDistribution Distribution, q []Queue, serviceDistributions 
 }
 
 // Simulate will terminate once C customers have completed.
-func SimulateCPU(λ float64, µs []float64, queues []Queue, C int, seed int64) (completes []Customer, rejects []Customer, exits []Customer) {
+func SimulateCPUIO(λ float64, µs []float64, queues []Queue, C int, seed int64) (rejects []Customer, completes []Customer, exits []Customer) {
 	transitions := map[int]float64{
 		0: 0.7,
 		1: 0.8,
@@ -104,7 +157,7 @@ func SimulateCPU(λ float64, µs []float64, queues []Queue, C int, seed int64) (
 
 	var customer Customer
 	var rejected, completed, exited <-chan Customer
-	rejected, completed, exited = RunCPUIo(
+	rejected, completed, exited = RunCPUIO(
 		NewExpDistribution(λ, seed),
 		queues,
 		serviceDistributions,
@@ -124,4 +177,25 @@ func SimulateCPU(λ float64, µs []float64, queues []Queue, C int, seed int64) (
 		}
 	}
 	return
+}
+
+// SimulateReplicationsCPUIO will terminate once C customers have completed.
+func SimulateReplicationsCPUIO(λ float64, µs []float64, Ks []int, C int, replications int, discard int, seed int64) map[int]SimMetricsList {
+	var metricsByQueue = make(map[int]SimMetricsList)
+	metricsChannel := make(chan SimMetricsList, replications) // the metrics list will be len 0 < x <= p, where x is the number of queues for priority queues.
+
+	var wg sync.WaitGroup
+	for i := 0; i < replications; i++ {
+		wg.Add(1)
+		go replicationCPUIO(&wg, i, λ, µs, Ks, C, seed, metricsChannel)
+	}
+	wg.Wait()
+	close(metricsChannel)
+
+	for waitTimesArray := range metricsChannel {
+		for queueIndex, w := range waitTimesArray {
+			metricsByQueue[queueIndex] = append(metricsByQueue[queueIndex], w)
+		}
+	}
+	return metricsByQueue
 }

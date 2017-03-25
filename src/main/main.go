@@ -64,7 +64,8 @@ func main() {
 		}
 		mm1kSimulationWithReplication(seed)
 	case 1:
-		cpuSimulation(seed)
+		// cpuSimulation(seed)
+		cpuSimulationWithReplication(seed)
 		os.Exit(1)
 	default:
 		fmt.Printf("usage: %s %s\n", os.Args[0], usageMsg)
@@ -93,6 +94,21 @@ func mm1kSimulationWithReplication(seed int64) {
 }
 
 // P2 implementation
+func cpuSimulationWithReplication(seed int64) {
+	fmt.Printf("======= Running CPU/IO Simulation =======\n")
+	fmt.Printf("λ =     %.3f\n", λ)
+	fmt.Printf("µcpu =  %.3f\n", µcpu)
+	fmt.Printf("µio =   %.3f\n", µio)
+	fmt.Printf("Kcpu =  %d\n", kcpu)
+	fmt.Printf("Kio =   %d\n", kio)
+	fmt.Printf("C =     %d\n", c)
+	fmt.Printf("L =     %d\n", l)
+
+	metricsListByQueue := mm1k.SimulateReplicationsCPUIO(λ, []float64{µcpu, µio, µio, µio}, []int{kcpu, kio, kio, kio}, c, replications, discard, seed)
+	mm1k.PrintMetricsListQueueMap(metricsListByQueue)
+}
+
+// P2 implementation
 func cpuSimulation(seed int64) {
 	fmt.Printf("======= Running CPU/IO Simulation =======\n")
 	fmt.Printf("λ =     %.3f\n", λ)
@@ -103,8 +119,9 @@ func cpuSimulation(seed int64) {
 	fmt.Printf("C =     %d\n", c)
 	fmt.Printf("L =     %d\n", l)
 
-	completes, rejects, exits := mm1k.SimulateCPU(λ, []float64{µcpu, µio, µio, µio}, []mm1k.Queue{mm1k.NewFIFO(kcpu), mm1k.NewFIFO(kio), mm1k.NewFIFO(kio), mm1k.NewFIFO(kio)}, c, seed)
+	rejects, completes, exits := mm1k.SimulateCPUIO(λ, []float64{µcpu, µio, µio, µio}, []mm1k.Queue{mm1k.NewFIFO(kcpu), mm1k.NewFIFO(kio), mm1k.NewFIFO(kio), mm1k.NewFIFO(kio)}, c, seed)
 	sorted := append(rejects, exits...)
+	sorted = append(sorted, completes...)
 	sort.Sort(mm1k.ByID(sorted))
 	totalEvents := sorted[len(sorted)-1].ID + 1
 	sampleServiceTimeMean := mm1k.Mean(completes, mm1k.Service)
@@ -115,13 +132,6 @@ func cpuSimulation(seed int64) {
 	fmt.Printf("Mean Service Time (S̄) =          %.3f\n", sampleServiceTimeMean)
 	fmt.Printf("Mean Wait Time (W̄) =             %.3f\n", mm1k.Mean(completes, mm1k.Wait))
 	fmt.Printf("Analytical Wait Time (W̄) =       %.3f\n", mm1k.AnalyticalWaitTime(λ, kcpu))
-
-	for _, customer := range sorted {
-		// L, L + 1, L + 10, and L + 11
-		if customer.ID == l || customer.ID == l+1 || customer.ID == l+10 || customer.ID == l+11 {
-			mm1k.PrintCustomer(customer)
-		}
-	}
 }
 
 // P1 implementation
