@@ -64,15 +64,13 @@ func main() {
 		}
 		mm1kSimulationWithReplication(seed)
 	case 1:
-		// cpuSimulation(seed)
 		cpuSimulationWithReplication(seed)
-		os.Exit(1)
 	default:
 		fmt.Printf("usage: %s %s\n", os.Args[0], usageMsg)
 		os.Exit(1)
 	}
 
-	mm1k.P2Question2(replications, seed)
+	mm1k.P2Question3(replications, seed)
 }
 
 // P2 implementation

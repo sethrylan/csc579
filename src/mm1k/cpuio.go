@@ -202,6 +202,7 @@ func SimulateReplicationsCPUIO(λ float64, µs []float64, Ks []int, C int, repli
 
 func PrintMetricsListQueueMapCPUIO(metricsListByQueue map[int]SimMetricsList) {
 	var keys []int
+	var metricsForAllQueues SimMetricsList
 	var sampleMean, sampleStdDev float64
 	var maxDeparture float64
 
@@ -217,13 +218,20 @@ func PrintMetricsListQueueMapCPUIO(metricsListByQueue map[int]SimMetricsList) {
 	fmt.Printf("\nClock        = %.3f (last exit of CPU queue, last replication)\n", maxDeparture)
 
 	for _, k := range keys {
+		for _, metrics := range metricsListByQueue[k] {
+			metricsForAllQueues = append(metricsForAllQueues, metrics)
+		}
+	}
+
+	for _, k := range keys {
 		sampleMean, sampleStdDev = metricsListByQueue[k].MeanAndStdDev(AverageWait)
 		if k == 0 {
 			fmt.Printf("W̄ait         =")
 		}
 		fmt.Printf(" %.3f±%.3f", sampleMean, sampleStdDev*2) // Print 95% confidence interval
 	}
-	fmt.Println()
+	sampleMean, sampleStdDev = metricsForAllQueues.MeanAndStdDev(AverageWait)
+	fmt.Printf("\nW̄ait (All)   = %.3f±%.3f\n", sampleMean, sampleStdDev*2)
 
 	for _, k := range keys {
 		sampleMean, sampleStdDev = metricsListByQueue[k].MeanAndStdDev(AverageSystem)
@@ -232,7 +240,8 @@ func PrintMetricsListQueueMapCPUIO(metricsListByQueue map[int]SimMetricsList) {
 		}
 		fmt.Printf(" %.3f±%.3f", sampleMean, sampleStdDev*2) // Print 95% confidence interval
 	}
-	fmt.Println()
+	sampleMean, sampleStdDev = metricsForAllQueues.MeanAndStdDev(AverageSystem)
+	fmt.Printf("\nS̄ystem (All) = %.3f±%.3f\n", sampleMean, sampleStdDev*2)
 
 	for _, k := range keys {
 		sampleMean, sampleStdDev = metricsListByQueue[k].MeanAndStdDev(CLR)
@@ -241,5 +250,6 @@ func PrintMetricsListQueueMapCPUIO(metricsListByQueue map[int]SimMetricsList) {
 		}
 		fmt.Printf(" %.3f±%.3f", sampleMean, sampleStdDev*2) // Print 95% confidence interval
 	}
-	fmt.Println()
+	sampleMean, sampleStdDev = metricsForAllQueues.MeanAndStdDev(CLR)
+	fmt.Printf("\nCLR (All)    = %.3f±%.3f\n", sampleMean, sampleStdDev*2)
 }

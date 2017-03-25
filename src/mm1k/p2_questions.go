@@ -6,6 +6,8 @@ import (
 )
 
 var µ = 1.0
+var µcpu = 1.0
+var µio = 0.5
 var discard = 1000
 
 // P2Question1 : Let µ = 1 as before, the size of the queue K = 40, and the number
@@ -44,10 +46,24 @@ func P2Question2(replications int, seed int64) {
 			// fmt.Printf("\n%s %f, %d, %d | ", GetFunctionName(makerFunc), ρ, K, C)
 			func() {
 				defer timeTrack(time.Now(), "\t")
-				// SimulateReplications(ρ, µ, makerFunc, K, C, replications, discard, seed)
 				Simulate(ρ, 1.0, makerFunc(K), C, seed)
 			}()
 		}
+	}
+	fmt.Println()
+}
+
+func P2Question3(replications int, seed int64) {
+	fmt.Printf("\n=======Starting P2Question2=======\n")
+	kcpu := 50
+	kio := 30
+	C := 100000
+	for ρ := 0.05; ρ <= 0.95; ρ += 0.10 {
+		fmt.Printf("\nρ=%f, Kcpu=%d, Kio=%d, C=%d\n", ρ, kcpu, kio, C)
+		func() {
+			metricsListByQueue := SimulateReplicationsCPUIO(ρ, []float64{µcpu, µio, µio, µio}, []int{kcpu, kio, kio, kio}, C, replications, discard, seed)
+			PrintMetricsListQueueMapCPUIO(metricsListByQueue)
+		}()
 	}
 	fmt.Println()
 }
