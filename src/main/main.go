@@ -58,12 +58,12 @@ func init() {
 
 func main() {
 	switch l {
-	case 1:
+	case 0:
 		if c <= discard {
 			fmt.Printf("WARNING: first %d events are discarded in metric calculations\n", discard)
 		}
 		mm1kSimulationWithReplication(seed)
-	case 2:
+	case 1:
 		cpuSimulation(seed)
 		os.Exit(1)
 	default:
