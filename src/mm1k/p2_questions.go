@@ -2,6 +2,7 @@ package mm1k
 
 import (
 	"fmt"
+	"math"
 	"time"
 )
 
@@ -54,16 +55,59 @@ func P2Question2(replications int, seed int64) {
 }
 
 func P2Question3(replications int, seed int64) {
-	fmt.Printf("\n=======Starting P2Question2=======\n")
+	fmt.Printf("\n=======Starting P2Question3=======\n")
 	kcpu := 50
 	kio := 30
 	C := 100000
 	for ρ := 0.05; ρ <= 0.95; ρ += 0.10 {
 		fmt.Printf("\nρ=%f, Kcpu=%d, Kio=%d, C=%d\n", ρ, kcpu, kio, C)
-		func() {
-			metricsListByQueue := SimulateReplicationsCPUIO(ρ, []float64{µcpu, µio, µio, µio}, []int{kcpu, kio, kio, kio}, C, replications, discard, seed)
-			PrintMetricsListQueueMapCPUIO(metricsListByQueue)
-		}()
+		metricsListByQueue := SimulateReplicationsCPUIO(ρ, []float64{µcpu, µio, µio, µio}, []int{kcpu, kio, kio, kio}, C, replications, discard, seed)
+		PrintMetricsListQueueMapCPUIO(metricsListByQueue)
+	}
+	fmt.Println()
+}
+
+func P2Question4(replications int, seed int64) {
+	fmt.Printf("\n=======Starting P2Question4=======\n")
+	kcpu := 40
+	C := 100000
+	for ρ := 0.10; ρ <= .60; ρ += 0.10 {
+		minimumClrForIOQueues := math.Inf(1)
+		for kio := 1; minimumClrForIOQueues >= 0.0001; kio++ {
+			fmt.Printf("\nρ=%f, Kcpu=%d, Kio=%d, C=%d: ", ρ, kcpu, kio, C)
+			// Using 1 replication
+			metricsListByQueue := SimulateReplicationsCPUIO(ρ, []float64{µcpu, µio, µio, µio}, []int{kcpu, kio, kio, kio}, C, 1, discard, seed)
+			for i := range []int{1, 2, 3} {
+				minimumClrForIOQueues = math.Min(metricsListByQueue[i][0].clr, minimumClrForIOQueues)
+			}
+			fmt.Printf("minimum CLR for IO Queues = %f ", minimumClrForIOQueues)
+		}
+	}
+	fmt.Println()
+}
+
+func P2Question5(replications int, seed int64) {
+	fmt.Printf("\n=======Starting P2Question5=======\n")
+	kcpu := 50
+	kio := 30
+	C := 100000
+	for ρ := 0.05; ρ <= 0.95; ρ += 0.10 {
+		fmt.Printf("\nρ=%f, Kcpu=%d, Kio=%d, C=%d\n", ρ, kcpu, kio, C)
+		_, completes, _ := SimulateCPUIO(ρ, []float64{µcpu, µio, µio, µio}, []Queue{NewFIFO(kcpu), NewFIFO(kio), NewFIFO(kio), NewFIFO(kio)}, C, seed)
+		completes = RemoveFirstNByDeparture(completes, discard)
+		// exits = RemoveFirstNByDeparture(exits, discard)
+
+		idsSet := make(map[int]struct{}) // unique list of ids
+		visitsPerQueue := make([]int, 4)
+		for _, c := range completes {
+			idsSet[c.ID] = struct{}{}
+			visitsPerQueue[c.PriorityQueue]++
+		}
+		fmt.Printf("Average per queue : ")
+		for _, visits := range visitsPerQueue {
+			fmt.Printf("%.3f  ", float64(visits)/float64(len(idsSet)))
+		}
+
 	}
 	fmt.Println()
 }
