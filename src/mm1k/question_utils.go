@@ -31,6 +31,21 @@ func CLR(m SimMetrics) float64 {
 	return m.clr
 }
 
+func MeanAndStdDev(metricsList []SimMetrics, fn func(m SimMetrics) float64) (mean float64, stdDev float64) {
+	n := len(metricsList)
+	if n == 0 {
+		return 0.0, 0.0
+	}
+	sum, squareSum := 0.0, 0.0
+	for _, m := range metricsList {
+		sum += fn(m)
+		squareSum += math.Pow(fn(m), 2)
+	}
+	mean = sum / float64(n)
+	variance := squareSum/float64(n) - mean*mean
+	return mean, math.Sqrt(variance)
+}
+
 func (metricsList SimMetricsList) MeanAndStdDev(fn func(m SimMetrics) float64) (mean float64, stdDev float64) {
 	n := len(metricsList)
 	if n == 0 {
