@@ -33,6 +33,7 @@ func replicationCPUIO(wg *sync.WaitGroup, i int, λ float64, µs []float64, Ks [
 
 	rejects, completes, exits := SimulateCPUIO(λ, µs, queues, c, seed)
 	completes = RemoveFirstNByDeparture(completes, discard)
+	exits = RemoveFirstNByDeparture(exits, discard)
 
 	completesByQueue := make(map[int][]Customer)
 	rejectsByQueue := make(map[int][]Customer)
@@ -192,8 +193,8 @@ func SimulateReplicationsCPUIO(λ float64, µs []float64, Ks []int, C int, repli
 	wg.Wait()
 	close(metricsChannel)
 
-	for waitTimesArray := range metricsChannel {
-		for queueIndex, w := range waitTimesArray {
+	for metricsArray := range metricsChannel {
+		for queueIndex, w := range metricsArray {
 			metricsByQueue[queueIndex] = append(metricsByQueue[queueIndex], w)
 		}
 	}
