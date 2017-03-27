@@ -45,6 +45,11 @@ func (q *FIFO) Len() int {
 	return len(q.a)
 }
 
+// NextQueue implements mm1k.Queue.NextQueue
+func (q *FIFO) NextQueue() int {
+	return 0
+}
+
 // Full implements mm1k.Queue.Full
 func (q *FIFO) Full() bool {
 	return q.Len() == q.capacity

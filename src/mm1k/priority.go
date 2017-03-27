@@ -57,6 +57,11 @@ func (q *Priority) Len() int {
 	return sum
 }
 
+// NextQueue implements mm1k.Queue.NextQueue
+func (q *Priority) NextQueue() int {
+	return q.next
+}
+
 // Full implements mm1k.Queue.Full
 func (q *Priority) Full() bool {
 	return q.a[q.next].Full()
@@ -66,7 +71,7 @@ func (q *Priority) Full() bool {
 func NewPriority(c int, p int, preemptive bool) (priority *Priority) {
 	priority = &Priority{a: make([]FIFO, p), p: p, preemptive: preemptive, generator: rand.New(rand.NewSource(2))}
 	for i := 0; i < p; i++ {
-		priority.a[i] = *NewFIFO(c)
+		priority.a[i] = *NewFIFO(c / p)
 	}
 	return
 }

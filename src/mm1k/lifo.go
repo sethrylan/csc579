@@ -55,6 +55,11 @@ func (q *LIFO) Dequeue() (c Customer) {
 	return q.pop()
 }
 
+// NextQueue implements mm1k.Queue.NextQueue
+func (q *LIFO) NextQueue() int {
+	return 0
+}
+
 // Enqueue implements mm1k.Queue.Enqueue
 func (q *LIFO) Enqueue(customer Customer) (cus Customer) {
 	q.lock.Lock()

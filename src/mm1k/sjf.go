@@ -37,6 +37,11 @@ func (q *SJF) Len() int {
 	return len(q.a)
 }
 
+// NextQueue implements mm1k.Queue.NextQueue
+func (q *SJF) NextQueue() int {
+	return 0
+}
+
 // Full implements mm1k.Queue.Full
 func (q *SJF) Full() bool {
 	return q.Len() == q.capacity

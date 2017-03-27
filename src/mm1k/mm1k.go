@@ -79,6 +79,8 @@ type Queue interface {
 
 	// Full returns true if queue is full
 	Full() bool
+
+	NextQueue() int
 }
 
 // SimulateReplications will terminate once C customers have completed.
@@ -175,7 +177,8 @@ func Run(arrivalDistribution Distribution, q Queue, serviceDistribution Distribu
 						Service:          serviceDistribution.Get(),
 						Departure:        t1,
 						QueueAtDeparture: q.Len(),
-						Position:         -1}
+						Position:         -1,
+						PriorityQueue:    q.NextQueue()}
 				} else {
 					q.Enqueue(Customer{ID: id,
 						Arrival: t1,
