@@ -30,3 +30,6 @@ vet:
 
 p1:
 	tar czvf p1.tar.gz --exclude=".DS_Store" Makefile readme.md ./src ./test ./p1/paper/
+
+p2:
+	tar czvf p2.tar.gz --exclude=".DS_Store" Makefile readme.md ./src ./test ./p2/paper/
