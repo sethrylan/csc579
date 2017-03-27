@@ -264,6 +264,8 @@ func PrintMetricsListQueueMap(metricsListByQueue map[int]SimMetricsList) {
 		}
 		fmt.Printf(" %.3f±%.3f", sampleMean, sampleStdDev*2) // Print 95% confidence interval
 	}
+	sampleMean, sampleStdDev = MeanAndStdDev(totalMetrics, CLR)
+	fmt.Printf(" (Overall : %.3f±%.3f)", sampleMean, sampleStdDev*2) // Print 95% confidence interval
 	fmt.Println()
 }
 
