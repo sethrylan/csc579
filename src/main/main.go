@@ -70,11 +70,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	mm1k.P2Question1(replications, seed)
-	mm1k.P2Question2(replications, seed)
-	mm1k.P2Question3(replications, seed)
-	mm1k.P2Question4(replications, seed)
-	mm1k.P2Question5(replications, seed)
+	// mm1k.P2Question1(replications, seed)
+	// mm1k.P2Question2a(replications, seed)
+	// mm1k.P2Question3(replications, seed)
+	// mm1k.P2Question4(replications, seed)
+	// mm1k.P2Question5(replications, seed)
 }
 
 // P2 implementation
