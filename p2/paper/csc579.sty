@@ -1,0 +1,186 @@
+%% Text area (margins)
+%% Margins
+\setlength{\topmargin}{0in}
+\setlength{\textheight}{8.75in}
+\setlength{\oddsidemargin}{0.25in}
+\setlength{\evensidemargin}{0.25in} % in case of double-sided handouts
+\setlength{\textwidth}{6.0in}
+
+% for adding comments to the text
+\newcommand{\cmt}[1]{{\sf [#1]}}
+
+%% Headings (smaller fonts than article style)
+\def\section{\@startsection {section}{1}{\z@}{-3.5ex plus -1ex minus 
+ -.2ex}{2.3ex plus .2ex}{\large\bf}}
+\def\subsection{\@startsection{subsection}{2}{\z@}{-3.25ex plus -1ex minus 
+ -.2ex}{1.5ex plus .2ex}{\normalsize\bf}}
+\def\subsubsection{\@startsection{subsubsection}{3}{\z@}{-3.25ex plus
+ -1ex minus -.2ex}{1.5ex plus .2ex}{\normalsize\bf}}
+
+\newcommand{\SEC}[1]{\section*{#1}}
+
+%% Page headings (the Header command needs to appear immediately after
+%%  "\begin{document}" and "\label{last}" needs to precede
+%%  "\end{document}")
+\pagestyle{myheadings}
+\thispagestyle{empty}
+
+\newcommand{\Header}[2]{
+\markright{#1 \hfill #2 \hfill page\hspace{0.5em}}
+\thispagestyle{empty}
+{\sl #1 \hfill #2 \hfill page 1 of \pageref{last}}\par
+}
+
+\newcommand{\TestHeader}[2]{
+\markright{#1 \hfill #2 \hfill UID: 
+\underline{\hspace{35mm}}
+~page~}
+\thispagestyle{empty}
+{\sl #1 \hfill #2 \hfill UID: \underline{\hspace{35mm}}}
+\par\medskip
+}
+
+%% Current Semester
+\newcommand*{\Semester}{%
+\ifcase\month
+\or Spring \or Spring \or Spring \or Spring \or Spring
+\or Summer \or Summer
+\or Fall \or Fall \or Fall \or Fall \or Fall \fi\space
+\number\year 
+}
+
+\newcommand{\HeaderWithCopyright}[2]{
+\renewcommand{\thefootnote}{$\fnsymbol{footnote}$}
+\renewcommand{\footnoterule}{\hrulefill}
+\Header{#1}{#2\protect\footnotetext{\copyright\
+Your Name, \number\year:
+All rights reserved.}}
+}
+
+%% Copyright
+\newcommand*{\CopyRight}{
+\copyright Your Name \number\year, all rights reserved.
+}
+
+%% Paragraph indentation and separation
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.7ex}
+
+%% Space for header and between header and text
+\setlength{\headheight}{1.75ex}
+\setlength{\headsep}{2ex}
+
+%% Lists (avoid too much separation)
+\setlength{\topsep}{0ex}
+\setlength{\partopsep}{0ex}
+
+%% Tables (make double rules look like thick lines)
+\setlength{\doublerulesep}{0.3mm}
+
+%% Modified list environments (redefine itemize and create Enumerate)
+
+% first (optional) arg of itemize is item tag
+\renewenvironment{itemize}[1][$\bullet$~]{
+\begin{list}{#1}{
+\setlength{\topsep}{-0.2ex}
+\setlength{\itemsep}{-0.1ex}      % for vertical spacing in lists
+\setlength{\parsep}{0.2ex}
+\setlength{\leftmargin}{1.7em}
+\setlength{\labelwidth}{1.3em}
+}
+}{
+\end{list}
+}
+
+% first (optional) argument of Enumerate is the tag type:
+% must use the form \protect\TYPE{MYCOUNTER}, where TYPE is one of roman,
+% alph, etc.
+% Enumerate environments CANNOT BE NESTED
+\newcounter{MYCOUNTER}
+\newenvironment{Enumerate}[1][\protect\arabic{MYCOUNTER}.~]{
+\begin{list}{#1}{
+\setlength{\topsep}{-0.2ex}
+\setlength{\itemsep}{-0.1ex}      % for vertical spacing in lists
+\setlength{\parsep}{0.2ex}
+\usecounter{MYCOUNTER}
+}
+}{
+\end{list}
+}
+
+
+
+\usepackage{ifthen}
+
+\newcommand{\HD}[1]{\Header{CSC 579, \Semester}{#1}}
+\newcommand{\HDC}[1]{\HeaderWithCopyright{CSC 579, \Semester}{#1}}
+\newcommand{\HWK}[2]{\HD{Homework \##1}\begin{center}Due: #2\end{center}}
+
+\newcommand{\Withold}[1]{#1}
+\newcommand{\OH}[1]{\ensuremath{{\mathrm O}(#1)}}
+\newcommand{\oh}[1]{\ensuremath{\mathrm o(#1)}}
+\newcommand{\LB}[1]{\ensuremath{\Omega(#1)}}
+\newcommand{\BT}[1]{\ensuremath{\Theta(#1)}}
+\newcommand{\CEIL}[1]{\ensuremath{\lceil #1 \rceil}}
+\newcommand{\FLOOR}[1]{\ensuremath{\lfloor #1 \rfloor}}
+\newcommand{\COMB}[2]{\ensuremath{C_{#2}^{#1}}}
+\newenvironment{algo}%     for algorithms
+{  \begin{minipage}{0.95\textwidth}
+    \begin{tabbing}
+      \setcounter{linecnt}{0}
+      xxx \= xxx \= xxx \= xxx \= xxx \= xxx \= xxx \= xxx
+      \= \+ \kill\\}%
+    {\end{tabbing}
+  \end{minipage}
+}
+\newcounter{linecnt}
+\newcommand{\NL}{\addtocounter{linecnt}{1} \< (\thelinecnt) \>}
+
+\newcommand{\FOR}{\mbox{\bf for }}
+\newcommand{\FOREACH}{\mbox{\bf foreach }}
+\newcommand{\TO}{\mbox{\bf to }}
+\newcommand{\DOWNTO}{\mbox{\bf downto }}
+\newcommand{\DO}{\mbox{\bf do }}
+\newcommand{\ENDDO}{\mbox{\bf end do}}
+\newcommand{\IF}{\mbox{\bf if~}}
+\newcommand{\THEN}{\mbox{\bf then~}}
+\newcommand{\ELSE}{\mbox{\bf else~}}
+\newcommand{\ELSEIF}{\mbox{\bf else~if~}}
+\newcommand{\ENDIF}{\mbox{\bf endif}}
+\newcommand{\PROC}{\mbox{\bf procedure~}}
+\newcommand{\FUNCTION}{\mbox{\bf function~}}
+\newcommand{\INPUT}{\mbox{\bf input:~}}
+\newcommand{\OUTPUT}{\mbox{\bf output:~}}
+\newcommand{\IS}{\mbox{\bf is~}}
+\newcommand{\RETURN}{\mbox{\bf return~}}
+\newcommand{\RETURNS}{\mbox{\bf returns~}}
+\newcommand{\MOD}{\mbox{\bf~modifies~}}
+\newcommand{\END}{\mbox{\bf end~}}
+\newcommand{\AND}{\mbox{\bf ~and~}}
+\newcommand{\OR}{\mbox{\bf ~or~}}
+\newcommand{\NOT}{\mbox{\bf not~}}
+\newcommand{\GETS}{\ensuremath{\; \leftarrow \;}}
+\newcommand{\WHILE}{\mbox{\bf while~}}
+\newcommand{\REPEAT}{\mbox{\bf repeat~}}
+\newcommand{\UNTIL}{\mbox{\bf until~}}
+\newcommand{\CMT}{\ensuremath{\triangleright} }
+\newcommand{\TRUE}{\mbox{\textbf{\emph{true}}}}
+\newcommand{\FALSE}{\mbox{\textbf{\emph{false}}}}
+\newcommand{\NIL}{\mbox{\textsc{nil}}}
+\newcommand{\VN}[1]{\ensuremath{\mathit{#1}}} % variable names
+\newcommand{\FN}[1]{\mbox{\textsc{#1}}} % function names
+\newcommand{\NULL}{\textbf{\emph{nil}}}
+
+\newcommand{\red}{\ensuremath{\leq_P}}
+\newcommand{\NP}{\ensuremath{\mathsf{NP}}}
+\newcommand{\NPC}{\ensuremath{\mathsf{NPC}}}
+\newcommand{\Ptime}{\ensuremath{\mathsf{P}}}
+\newenvironment{prf}[1]{%    for equations with comments on each step
+                        %    (argument gives size of comment box)
+       \[\begin{array}{rclp{#1}}
+}{
+\end{array}\]
+}
+\newcommand{\DS}{\displaystyle} % to make it easier to force ``large''
+                                % summation signs
+
