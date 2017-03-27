@@ -679,77 +679,10 @@ customers leaving the system, possibly after each has made several trips to the 
 \\
 \medskip\\\texttt{
 \\
-\begin{tikzpicture}[scale=1.0]
-\begin{axis}[
-    legend pos=north west,
-    title= {$K=20 \quad C=100,000$},  
-	ymin=0,
-	y post scale=2,
-	x post scale=2,
-	ybar=0pt,
-	enlargelimits={abs=0.5},
-    xmin=0,
-    xmax=1,
-	xlabel = {$\rho$},
-    ylabel = {$CLR$},
-	xtick=data,
-	ytick=data,
-	ticklabel style={
-        /pgf/number format/fixed,
-        /pgf/number format/precision=5
-	},
-	x tick label style={rotate=45, anchor=east, align=center, xshift=.1cm,yshift=-0.1cm},
-	axis lines=left
-	]
-\addplot+[error bars/.cd,
-y dir=both,y explicit]
-coordinates {
-    (0.05,0.000) +- (0.0,0.000)
-    (0.15,0.000) +- (0.0,0.000)
-    (0.25,0.000) +- (0.0,0.000)
-    (0.35,0.000) +- (0.0,0.000)
-    (0.45,0.000) +- (0.0,0.000)
-    (0.55,0.000) +- (0.0,0.000)
-    (0.65,0.000) +- (0.0,0.000)
-    (0.75,0.001) +- (0.0,0.000)
-    (0.85,0.006) +- (0.0,0.002)
-    (0.95,0.028) +- (0.0,0.003)
-};
-\addplot+[error bars/.cd,
-y dir=both,y explicit]
-coordinates {
-    (0.05,0.000) +- (0.0,0.000)
-    (0.15,0.000) +- (0.0,0.000)
-    (0.25,0.000) +- (0.0,0.000)
-    (0.35,0.000) +- (0.0,0.000)
-    (0.45,0.000) +- (0.0,0.000)
-    (0.55,0.000) +- (0.0,0.000)
-    (0.65,0.000) +- (0.0,0.000)
-    (0.75,0.001) +- (0.0,0.000)
-    (0.85,0.006) +- (0.0,0.002)
-    (0.95,0.028) +- (0.0,0.003)
-};
-\addplot+[error bars/.cd,
-y dir=both,y explicit]
-coordinates {
-    (0.05,0.000) +- (0.0,0.000)
-    (0.15,0.000) +- (0.0,0.000)
-    (0.25,0.000) +- (0.0,0.000)
-    (0.35,0.000) +- (0.0,0.000)
-    (0.45,0.002) +- (0.0,0.000)
-    (0.55,0.008) +- (0.0,0.001)
-    (0.65,0.026) +- (0.0,0.002)
-    (0.75,0.056) +- (0.0,0.003)
-    (0.85,0.097) +- (0.0,0.004)
-    (0.95,0.144) +- (0.0,0.004)
-};
-\legend{FIFO, LCFS, SFJ}
-\end{axis}
-\end{tikzpicture}
 \begin{tikzpicture}
 \begin{axis}[
     legend pos=north west,
-    title= {$K=20 \quad C=100,000$},  
+    title= {$K_{cpu}=50, K_{i/o}=30 \quad C=100,000$},  
 	ymin=0,
 	y post scale=2,
 	x post scale=2,
@@ -772,277 +705,233 @@ coordinates {
 \addplot+[error bars/.cd,
 y dir=both,y explicit]
 coordinates {
-    (0.05,0.000) +- (0.0,0.000)
-    (0.15,0.000) +- (0.0,0.000)
-    (0.25,0.000) +- (0.0,0.000)
-    (0.35,0.000) +- (0.0,0.000)
-    (0.45,0.000) +- (0.0,0.000)
-    (0.55,0.000) +- (0.0,0.000)
+    (0.05,0.131) +- (0.0,0.009) 
+    (0.15,0.583) +- (0.0,0.019) 
+    (0.25,1.468) +- (0.0,0.063) 
+    (0.35,3.416) +- (0.0,0.172) 
+    (0.45,9.983) +- (0.0,0.625) 
+    (0.55,52.190) +- (0.0,2.163) 
+    (0.65,81.432) +- (0.0,0.940) 
+    (0.75,86.229) +- (0.0,0.703) 
+    (0.85,87.977) +- (0.0,0.667) 
+    (0.95,88.825) +- (0.0,0.612) 
+};
+\addplot+[error bars/.cd,
+y dir=both,y explicit]
+coordinates {
+    (0.05,0.028) +- (0.0,0.008) 
+    (0.15,0.077) +- (0.0,0.015) 
+    (0.25,0.115) +- (0.0,0.016) 
+    (0.35,0.131) +- (0.0,0.017) 
+    (0.45,0.103) +- (0.0,0.019) 
+    (0.55,0.015) +- (0.0,0.010) 
     (0.65,0.000) +- (0.0,0.000)
     (0.75,0.000) +- (0.0,0.000)
     (0.85,0.000) +- (0.0,0.000)
-    (0.95,0.001) +- (0.0,0.001)
+    (0.95,0.000) +- (0.0,0.000)
 };
 \addplot+[error bars/.cd,
 y dir=both,y explicit]
 coordinates {
-    (0.05,0.000) +- (0.0,0.000)
-    (0.15,0.000) +- (0.0,0.000)
-    (0.25,0.000) +- (0.0,0.000)
-    (0.35,0.000) +- (0.0,0.000)
-    (0.45,0.000) +- (0.0,0.000)
-    (0.55,0.000) +- (0.0,0.000)
-    (0.65,0.001) +- (0.0,0.001)
-    (0.75,0.001) +- (0.0,0.001)
-    (0.85,0.002) +- (0.0,0.001)
-    (0.95,0.004) +- (0.0,0.002)
-};
-\addplot+[error bars/.cd,
-y dir=both,y explicit]
-coordinates {
-    (0.05,0.000) +- (0.0,0.000)
-    (0.15,0.000) +- (0.0,0.000)
-    (0.25,0.000) +- (0.0,0.000)
-    (0.35,0.000) +- (0.0,0.000)
-    (0.45,0.000) +- (0.0,0.000)
-    (0.55,0.000) +- (0.0,0.000)
-    (0.65,0.001) +- (0.0,0.001)
-    (0.75,0.003) +- (0.0,0.001)
-    (0.85,0.007) +- (0.0,0.002)
-    (0.95,0.012) +- (0.0,0.003)
-};
-\addplot+[error bars/.cd,
-y dir=both,y explicit]
-coordinates {
-    (0.05,0.000) +- (0.0,0.000)
-    (0.15,0.000) +- (0.0,0.000)
-    (0.25,0.000) +- (0.0,0.000)
-    (0.35,0.000) +- (0.0,0.000)
-    (0.45,0.000) +- (0.0,0.000)
-    (0.55,0.001) +- (0.0,0.001)
-    (0.65,0.003) +- (0.0,0.001)
-    (0.75,0.006) +- (0.0,0.002)
-    (0.85,0.014) +- (0.0,0.002)
-    (0.95,0.026) +- (0.0,0.003)
-};
-\addplot+[error bars/.cd,
-y dir=both,y explicit]
-coordinates {
-    (0.05,0.000) +- (0.0,0.000)
-    (0.15,0.000) +- (0.0,0.000)
-    (0.25,0.000) +- (0.0,0.000)
-    (0.35,0.000) +- (0.0,0.000)
-    (0.45,0.000) +- (0.0,0.000)
-    (0.55,0.000) +- (0.0,0.001)
-    (0.65,0.001) +- (0.0,0.002)
-    (0.75,0.003) +- (0.0,0.005)
-    (0.85,0.006) +- (0.0,0.010)
-    (0.95,0.011) +- (0.0,0.019)
-};
-\legend{PriorityNP[1], PriorityNP[2], PriorityNP[3], PriorityNP[4], PriorityNP[all]}
-\end{axis}
-\end{tikzpicture}
-\\
-\begin{tikzpicture}
-\begin{axis}[
-    legend pos=north west,
-    title= {$K=20 \quad C=100,000$},  
-	ymin=0,
-	y post scale=2,
-	x post scale=2,
-	ybar=0pt,
-	bar width=0.015,
-	enlargelimits={abs=0.5},
-    xmin=0,
-    xmax=1,
-	xlabel = {$\rho$},
-    ylabel = {$CLR$},
-	xtick=data,
-	ytick=data,
-	ticklabel style={
-        /pgf/number format/fixed,
-        /pgf/number format/precision=5
-	},
-	x tick label style={rotate=45, anchor=east, align=center, xshift=.1cm,yshift=-0.1cm},
-	axis lines=left
-	]
-\addplot+[error bars/.cd,
-y dir=both,y explicit]
-coordinates {
-    (0.05,0.000) +- (0.0,0.000)
-    (0.15,0.000) +- (0.0,0.000)
-    (0.25,0.000) +- (0.0,0.000)
-    (0.35,0.000) +- (0.0,0.000)
-    (0.45,0.000) +- (0.0,0.000)
-    (0.55,0.000) +- (0.0,0.000)
-    (0.65,0.000) +- (0.0,0.000)
+    (0.05,0.026) +- (0.0,0.009) 
+    (0.15,0.078) +- (0.0,0.010) 
+    (0.25,0.115) +- (0.0,0.015) 
+    (0.35,0.130) +- (0.0,0.018) 
+    (0.45,0.105) +- (0.0,0.017) 
+    (0.55,0.014) +- (0.0,0.006) 
+    (0.65,0.000) +- (0.0,0.001)
     (0.75,0.000) +- (0.0,0.000)
     (0.85,0.000) +- (0.0,0.000)
-    (0.95,0.001) +- (0.0,0.001)
+    (0.95,0.000) +- (0.0,0.000)
 };
 \addplot+[error bars/.cd,
 y dir=both,y explicit]
 coordinates {
-    (0.05,0.000) +- (0.0,0.000)
-    (0.15,0.000) +- (0.0,0.000)
-    (0.25,0.000) +- (0.0,0.000)
-    (0.35,0.000) +- (0.0,0.000)
-    (0.45,0.001) +- (0.0,0.001)
-    (0.55,0.002) +- (0.0,0.001)
-    (0.65,0.005) +- (0.0,0.002)
-    (0.75,0.010) +- (0.0,0.002)
-    (0.85,0.015) +- (0.0,0.004)
-    (0.95,0.021) +- (0.0,0.004)
+    (0.05,0.028) +- (0.0,0.007) 
+    (0.15,0.078) +- (0.0,0.014) 
+    (0.25,0.115) +- (0.0,0.018) 
+    (0.35,0.131) +- (0.0,0.015) 
+    (0.45,0.104) +- (0.0,0.021) 
+    (0.55,0.015) +- (0.0,0.007) 
+    (0.65,0.000) +- (0.0,0.001) 
+    (0.75,0.000) +- (0.0,0.000)
+    (0.85,0.000) +- (0.0,0.000)
+    (0.95,0.000) +- (0.0,0.000)
 };
 \addplot+[error bars/.cd,
 y dir=both,y explicit]
 coordinates {
-    (0.05,0.000) +- (0.0,0.000)
-    (0.15,0.000) +- (0.0,0.000)
-    (0.25,0.000) +- (0.0,0.000)
-    (0.35,0.001) +- (0.0,0.001)
-    (0.45,0.006) +- (0.0,0.002)
-    (0.55,0.018) +- (0.0,0.003)
-    (0.65,0.039) +- (0.0,0.005)
-    (0.75,0.065) +- (0.0,0.007)
-    (0.85,0.096) +- (0.0,0.007)
-    (0.95,0.129) +- (0.0,0.009)
+    (0.05,0.053) +- (0.0,0.090)
+    (0.15,0.204) +- (0.0,0.438)
+    (0.25,0.453) +- (0.0,1.172)
+    (0.35,0.952) +- (0.0,2.846)
+    (0.45,2.574) +- (0.0,8.561)
+    (0.55,13.059) +- (0.0,45.198)
+    (0.65,20.358) +- (0.0,70.524)
+    (0.75,21.557) +- (0.0,74.677)
+    (0.85,21.994) +- (0.0,76.191)
+    (0.95,22.206) +- (0.0,76.925)
 };
-\addplot+[error bars/.cd,
-y dir=both,y explicit]
-coordinates {
-    (0.05,0.000) +- (0.0,0.000)
-    (0.15,0.000) +- (0.0,0.000)
-    (0.25,0.000) +- (0.0,0.000)
-    (0.35,0.006) +- (0.0,0.002)
-    (0.45,0.032) +- (0.0,0.004)
-    (0.55,0.096) +- (0.0,0.009)
-    (0.65,0.196) +- (0.0,0.009)
-    (0.75,0.310) +- (0.0,0.009)
-    (0.85,0.413) +- (0.0,0.009)
-    (0.95,0.499) +- (0.0,0.008)
-};
-\addplot+[error bars/.cd,
-y dir=both,y explicit]
-coordinates {
-    (0.05,0.000) +- (0.0,0.000)
-    (0.15,0.000) +- (0.0,0.000)
-    (0.25,0.000) +- (0.0,0.001)
-    (0.35,0.002) +- (0.0,0.005)
-    (0.45,0.010) +- (0.0,0.027)
-    (0.55,0.029) +- (0.0,0.078)
-    (0.65,0.060) +- (0.0,0.160)
-    (0.75,0.096) +- (0.0,0.252)
-    (0.85,0.131) +- (0.0,0.334)
-    (0.95,0.163) +- (0.0,0.401)
-};
-\legend{PriorityP[1], PriorityP[2], PriorityP[3], PriorityP[4], PriorityP[all]}
+\legend{CPU], IO1, IO2, IO3, All]}
 \end{axis}
 \end{tikzpicture}
 \\
-\begin{tikzpicture}[scale=1.0]
-\begin{axis}[
-    legend pos=north west,
-    title= {$K=20 \quad C=1,000,000$},  
-	ymin=0,
-	y post scale=2,
-	x post scale=2,
-	ybar=0pt,
-	bar width=0.015,
-	enlargelimits={abs=0.5},
-    xmin=0,
-    xmax=1,
-	xlabel = {$\rho$},
-    ylabel = {$Seconds$},
-	xtick=data,
-	ytick=data,
-	ticklabel style={
-        /pgf/number format/fixed,
-        /pgf/number format/precision=5
-	},
-	x tick label style={rotate=45, anchor=east, align=center, xshift=.1cm,yshift=-0.1cm},
-	axis lines=left
-	]
-\addplot+[error bars/.cd,
-y dir=both,y explicit]
-coordinates {
-    (0.05,6.945)
-    (0.15,6.672)
-    (0.25,6.519)
-    (0.35,7.233)
-    (0.45,5.897)
-    (0.55,5.897)
-    (0.65,5.902)
-    (0.75,5.927)
-    (0.85,5.935)
-    (0.95,6.066)
-};
-\addplot+[error bars/.cd,
-y dir=both,y explicit]
-coordinates {
-    (0.05,7.776)
-    (0.15,6.991)
-    (0.25,7.928)
-    (0.35,8.388)
-    (0.45,9.754)
-    (0.55,8.943)
-    (0.65,10.020)
-    (0.75,12.485)
-    (0.85,16.877)
-    (0.95,23.630)
-};
-\addplot+[error bars/.cd,
-y dir=both,y explicit]
-coordinates {
-    (0.05,6.800)
-    (0.15,7.183)
-    (0.25,8.054)
-    (0.35,9.167)
-    (0.45,10.529)
-    (0.55,11.475)
-    (0.65,13.886)
-    (0.75,16.691)
-    (0.85,19.046)
-    (0.95,20.992)
-};
-\addplot+[error bars/.cd,
-y dir=both,y explicit]
-coordinates {
-    (0.05,6.396)
-    (0.15,6.799)
-    (0.25,6.228)
-    (0.35,6.552)
-    (0.45,6.032)
-    (0.55,5.990)
-    (0.65,6.015)
-    (0.75,6.039)
-    (0.85,6.065)
-    (0.95,6.018)
-};
-\addplot+[error bars/.cd,
-y dir=both,y explicit]
-coordinates {
-    (0.05,6.853)
-    (0.15,6.829)
-    (0.25,7.167)
-    (0.35,6.962)
-    (0.45,6.023)
-    (0.55,6.002)
-    (0.65,6.173)
-    (0.75,6.459)
-    (0.85,6.907)
-    (0.95,7.430)
-};
-\legend{FIFO, LCFS, SFJ, PRIO-NP, PRIO-P}
-\end{axis}
-\end{tikzpicture}
-\\
-TODO
+At low values of $\rho$, the CLR for the CPU and IO queues remains low but >0. As $\rho$ increases, the CPU queue becomes saturated and its CLR rises, resulting in a drop in CLR to the IO queues, since fewer (and then zero) jobs will be passed on these queues.
 }
 \bigskip
 \newpage
 
 
+
+
+%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%
+
+\textbf{Task 4 (Web Server with I/O)}
+Let $K_{CPU} = 40, C = 100, 000$, and vary $\rho$ from 0.10 to 0.60 in
+increments of 0.10. For each value of $\rho$, determine the minimum value $K_{I/O}$ of the I/O queues so that the CLR for any of these queues is less than 0.01 percent.
+\\
+\medskip\\\texttt{
+\\
+\begin{tikzpicture}
+\begin{axis}[
+    legend pos=north west,
+    title= {$K_{cpu}=40; CLR<0.0001 \quad C=100,000$},  
+	ymin=0,
+	y post scale=2,
+	x post scale=2,
+	ybar=0pt,
+	%bar width=0.015,
+	enlargelimits={abs=0.5},
+    xmin=0,
+    xmax=1,
+	xlabel = {$\rho$},
+    ylabel = {$K_{i/o}$},
+	xtick=data,
+	ytick=data,
+	ticklabel style={
+        /pgf/number format/fixed,
+        /pgf/number format/precision=5
+	},
+	x tick label style={rotate=45, anchor=east, align=center, xshift=.1cm,yshift=-0.1cm},
+	axis lines=left
+	]
+\addplot+[error bars/.cd,
+y dir=both,y explicit]
+coordinates {
+(0.10, 1)
+(0.20, 1)
+(0.30, 1)
+(0.40, 1)
+(0.50, 3)
+(0.60, 2)
+};
+\end{axis}
+\end{tikzpicture}
+\\
+At higher values of $\rho$ for a given $K_{CPU}$, a higher $K_{IO}$ is needed to maintain a low CLR, but at higher values of rho, the size of the IO queues is irrelevant.
+}
+\bigskip
+\newpage
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%
+
+\textbf{Task 5 (Web Server with I/O)}
+Estimate the average number of times that a customer visits the CPU queue and each of the I/O disk queues. Plot these values against the value of $\rho$. Do they change as $\rho$ increases? Why or why not?
+\\
+\medskip\\\texttt{
+\\
+\begin{tikzpicture}[scale=1.0]
+\begin{axis}[
+    legend pos=north west,
+    title= {$K=20 \quad C=100,000$},  
+	ymin=0,
+	y post scale=2,
+	x post scale=2,
+	ybar=0pt,
+	enlargelimits={abs=0.5},
+    xmin=0,
+    xmax=1,
+	xlabel = {$\rho$},
+    ylabel = {$CLR$},
+	xtick=data,
+	ytick=data,
+	ticklabel style={
+        /pgf/number format/fixed,
+        /pgf/number format/precision=5
+	},
+	x tick label style={rotate=45, anchor=east, align=center, xshift=.1cm,yshift=-0.1cm},
+	axis lines=left
+	]
+\addplot+[error bars/.cd,
+y dir=both,y explicit]
+coordinates {
+    (0.05, 1.431)
+    (0.15, 1.428)
+    (0.25, 1.428)
+    (0.35, 1.428)
+    (0.45, 1.431)
+    (0.55, 1.431)
+    (0.65, 1.429)
+    (0.75, 1.431)
+    (0.85, 1.430)
+    (0.95, 1.430)
+};
+\addplot+[error bars/.cd,
+y dir=both,y explicit]
+coordinates {
+    (0.05, 0.142)
+    (0.15, 0.144)
+    (0.25, 0.142)
+    (0.35, 0.143)
+    (0.45, 0.143)
+    (0.55, 0.142)
+    (0.65, 0.142)
+    (0.75, 0.145)
+    (0.85, 0.143)
+    (0.95, 0.143)
+};
+\addplot+[error bars/.cd,
+y dir=both,y explicit]
+coordinates {
+    (0.05, 0.144)
+    (0.15, 0.142)
+    (0.25, 0.142)
+    (0.35, 0.143)
+    (0.45, 0.144)
+    (0.55, 0.144)
+    (0.65, 0.144)
+    (0.75, 0.143)
+    (0.85, 0.143)
+    (0.95, 0.143)
+};
+\addplot+[error bars/.cd,
+y dir=both,y explicit]
+coordinates {
+    (0.05, 0.145)
+    (0.15, 0.142)
+    (0.25, 0.144)
+    (0.35, 0.142)
+    (0.45, 0.143)
+    (0.55, 0.145)
+    (0.65, 0.143)
+    (0.75, 0.143)
+    (0.85, 0.143)
+    (0.95, 0.144)
+};
+\legend{CPU, IO1, IO2, IO3}
+\end{axis}
+\end{tikzpicture}
+\\
+A customer that exits the system will have visited the CPU and 0 or more IO queues based only the transition probabilities, not on the rate of customers entering the system.
+}
+\bigskip
+\newpage
 
 \bigskip
 
