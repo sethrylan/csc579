@@ -103,7 +103,7 @@ func Mean(customers []Customer, fn field) float64 {
 
 // RemoveFirstNByDeparture removes the first n deparatures in a list of customers
 func RemoveFirstNByDeparture(customers []Customer, n int) []Customer {
-	sort.Sort(byDeparture(customers))
+	sort.Sort(ByDeparture(customers))
 	return customers[n:]
 }
 

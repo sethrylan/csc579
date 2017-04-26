@@ -29,18 +29,18 @@ func (a ByID) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByID) Less(i, j int) bool { return a[i].ID < a[j].ID }
 
 // byService implements sort.Interface for []Customer
-type byService []Customer
+type ByService []Customer
 
-func (a byService) Len() int           { return len(a) }
-func (a byService) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a byService) Less(i, j int) bool { return a[i].Service < a[j].Service }
+func (a ByService) Len() int           { return len(a) }
+func (a ByService) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByService) Less(i, j int) bool { return a[i].Service < a[j].Service }
 
 // byDeparture implements sort.Interface for []Customer
-type byDeparture []Customer
+type ByDeparture []Customer
 
-func (a byDeparture) Len() int           { return len(a) }
-func (a byDeparture) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a byDeparture) Less(i, j int) bool { return a[i].Departure < a[j].Departure }
+func (a ByDeparture) Len() int           { return len(a) }
+func (a ByDeparture) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByDeparture) Less(i, j int) bool { return a[i].Departure < a[j].Departure }
 
 type field func(c Customer) float64
 
@@ -127,7 +127,7 @@ func replication(wg *sync.WaitGroup, i int, λ float64, µ float64, queue Queue,
 	for k, completes := range completesByQueue {
 		metricsListByQueue[k].Wait = Mean(completes, Wait)
 		metricsListByQueue[k].System = Mean(completes, System)
-		sort.Sort(byDeparture(completes))
+		sort.Sort(ByDeparture(completes))
 		metricsListByQueue[k].LastDeparture = completes[len(completes)-1].Departure
 		metricsListByQueue[k].CLR = EmpiricalCLR(len(rejectsByQueue[k]), len(rejectsByQueue[k])+len(completes))
 	}

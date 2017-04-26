@@ -55,7 +55,7 @@ func replicationCPUIO(wg *sync.WaitGroup, i int, λ float64, µs []float64, Ks [
 	for k, completes := range completesByQueue {
 		metricsListByQueue[k].Wait = Mean(completes, Wait)
 		metricsListByQueue[k].System = Mean(completes, System)
-		sort.Sort(byDeparture(completes))
+		sort.Sort(ByDeparture(completes))
 		metricsListByQueue[k].LastDeparture = completes[len(completes)-1].Departure
 		metricsListByQueue[k].CLR = EmpiricalCLR(len(rejectsByQueue[k]), len(rejectsByQueue[k])+len(completes))
 	}
