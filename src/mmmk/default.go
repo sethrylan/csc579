@@ -1,42 +1,72 @@
 package mmmk
 
 import (
+	"math"
 	"mm1k"
 	"sort"
 )
 
-type InfiniteQueue struct {
-	qType int // 0 - FIFO; 1 - SJF
-	arr   []float64
-	back  int
+type job struct {
+	serveAt     float64
+	serviceTime float64
+}
+type byServiceTime []job
+
+func (a byServiceTime) Len() int           { return len(a) }
+func (a byServiceTime) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a byServiceTime) Less(i, j int) bool { return a[i].serviceTime < a[j].serviceTime }
+
+type FIFO struct {
+	arr []job
+	// back int
 }
 
-func NewInfiniteQueue(queueType int) (q InfiniteQueue) {
-	q.arr = make([]float64, 10000000)
-	q.qType = queueType
-	return
+func NewFIFO() (q *FIFO) {
+	return &FIFO{make([]job, 0)}
 }
 
-func (q InfiniteQueue) Enqueue(arriveAt, serverAvailableAt float64) (t1 float64, sid int) {
-	switch q.qType {
-	case 0: // FIFO
-		if arriveAt < serverAvailableAt { // If arrival is before next available service time
-			t1 = serverAvailableAt // then queue job for next service time
-		} else { // otherwise
-			t1 = arriveAt // queue the job for the arrival time
-		}
-		q.arr[q.back] = t1
-		sid = q.back
-		q.back++
-	case 1: // SJF
-	default:
-		panic("queue type not implementated")
+func (q *FIFO) Enqueue(arriveAt, serviceTime, serverAvailableAt float64) (j job) {
+	j.serviceTime = serviceTime
+	if arriveAt < serverAvailableAt { // If arrival is before next available service time
+		j.serveAt = serverAvailableAt // then queue job for next service time
+	} else { // otherwise
+		j.serveAt = arriveAt // queue the job for the arrival time
 	}
+	q.arr = append(q.arr, j)
 	return
 }
 
-func (q InfiniteQueue) Next() float64 {
-	return q.arr[q.back]
+func (q *FIFO) Next() (j job) {
+	j = q.arr[0]
+	q.arr = q.arr[1:]
+	return
+}
+
+type SJF struct {
+	arr []job
+}
+
+func NewSJF() (q SJF) {
+	q.arr = make([]job, 0)
+	return
+}
+
+func (q SJF) Enqueue(arriveAt, serviceTime, serverAvailableAt float64) (j job) {
+	j.serviceTime = serviceTime
+	if arriveAt < serverAvailableAt { // If arrival is before next available service time
+		j.serveAt = serverAvailableAt // then queue job for next service time
+	} else { // otherwise
+		j.serveAt = arriveAt // queue the job for the arrival time
+	}
+	q.arr = append(q.arr, j)
+	sort.Sort(byServiceTime(q.arr))
+	return
+}
+
+func (q SJF) Next() (j job) {
+	j = q.arr[:1][0]
+	q.arr = q.arr[1:]
+	return
 }
 
 type server struct {
@@ -62,17 +92,17 @@ func (s MinService) Get() float64 {
 }
 
 // Return departure time and serverID
-func (s MinService) Serve(now float64) (depTime float64, sid int) {
+func (s MinService) Serve(now job) (depTime float64, sid int) {
 	sid = s.a[0].id
-	depTime = now + s.gen.Get()
+	depTime = math.Max(s.a[0].now, now.serveAt) + now.serviceTime
 	s.a[0].now = depTime
 	sort.Sort(ByNow(s.a))
 	return
 }
 
 // Eariliest available time is returned
-func (s MinService) Next() float64 {
-	return s.a[0].now
+func (s MinService) Next() job {
+	return job{s.a[0].now, 0}
 }
 
 // Make a MinService of m servers

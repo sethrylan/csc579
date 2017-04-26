@@ -9,15 +9,16 @@ import (
 )
 
 type Queuer interface {
-	Enqueue(arriveAt float64, serverAvailableAt float64) (serveAt float64, position int)
+	Enqueue(arriveAt, serviceTime, serverAvailableAt float64) job
 }
 
 type Server interface {
-	Serve(startAt float64) (completeAt float64, serverID int)
+	Serve(j job) (completeAt float64, serverID int)
+	Get() float64 // return RV from service distribution
 }
 
 type Nexter interface {
-	Next() (nextAvailableAt float64)
+	Next() (nextJob job)
 }
 
 type Queue interface {
@@ -33,38 +34,45 @@ type Service interface {
 func Run(a mm1k.Distribution, q Queue, s Service) (rejects, completes <-chan mm1k.Customer) {
 	rejected := make(chan mm1k.Customer)  // Unbuffered channels ensure deterministic simulation
 	completed := make(chan mm1k.Customer) //
-	var clock float64                     // master clock
 
 	go func() {
 		var t0 float64           // time of next arrival
-		var t1 float64           // time of next start
+		var t1 job               // job of next start
 		var t2 float64           // time of next completion (∞ for no schedule Customer)
 		var id int               // Incremented Customer ID
-		var chs float64          // time of next available service
+		var chs job              // time of next available service
 		var position, server int // position and server id
 		for {
 			t0 += a.Get()
 			// no rejections
 
-			t1, position = q.Enqueue(t0, chs)
-			q.Next()
+			q.Enqueue(t0, s.Get(), chs.serveAt)
+			t1 = q.Next()
 			// waited from t0 to t1
 
 			t2, server = s.Serve(t1)
 			chs = s.Next()
 			// served from t1 to t2 by server
+			mm1k.PrintCustomer(mm1k.Customer{
+				ID:        id,
+				Arrival:   t0,
+				Service:   t1.serviceTime,
+				Start:     t1.serveAt,
+				Departure: t2,
+				Position:  position,
+				Server:    server,
+			})
 
 			completed <- mm1k.Customer{
 				ID:        id,
 				Arrival:   t0,
-				Service:   t2 - t1,
-				Start:     t1,
+				Service:   t1.serviceTime,
+				Start:     t1.serveAt,
 				Departure: t2,
 				Position:  position,
 				Server:    server,
 			} // departed
 			id++
-			clock = t2
 		}
 	}()
 
@@ -127,10 +135,17 @@ func replication(wg *sync.WaitGroup, i int, λ float64, queueType int, server Se
 // Simulate will terminate once C customers have completed.
 func Simulate(λ float64, queueType int, server Service, C int, seed int64) (rejects []mm1k.Customer, completes []mm1k.Customer) {
 	var customer mm1k.Customer
+	var queue Queue
 	var rejected, completed <-chan mm1k.Customer
+	switch queueType {
+	case 0:
+		queue = NewFIFO()
+	case 1:
+		queue = NewSJF()
+	}
 	rejected, completed = Run(
 		mm1k.NewExpDistribution(λ, seed),
-		NewInfiniteQueue(queueType),
+		queue,
 		server,
 	)
 	for len(completes) < C {
