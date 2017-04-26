@@ -28,9 +28,9 @@ func ExampleNewSFJNP() {
 	// Len() = 0
 	// NextCompletion() = +Inf
 	// Full() = false
-	// {1 0.5 0.2 0.5 0 0 0 0}
+	// {1 0.5 0.2 0.5 0 0 0 0 0}
 	// NextCompletion() = 0.70
-	// {2 0.5 0.1 0 0 1 0 0}
+	// {2 0.5 0.1 0 0 1 0 0 0}
 	// NextCompletion() = 0.80
 }
 

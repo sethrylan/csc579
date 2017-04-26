@@ -53,11 +53,11 @@ func replicationCPUIO(wg *sync.WaitGroup, i int, λ float64, µs []float64, Ks [
 
 	metricsListByQueue := make(SimMetricsList, len(completesByQueue))
 	for k, completes := range completesByQueue {
-		metricsListByQueue[k].wait = Mean(completes, Wait)
-		metricsListByQueue[k].system = Mean(completes, System)
+		metricsListByQueue[k].Wait = Mean(completes, Wait)
+		metricsListByQueue[k].System = Mean(completes, System)
 		sort.Sort(byDeparture(completes))
-		metricsListByQueue[k].lastDeparture = completes[len(completes)-1].Departure
-		metricsListByQueue[k].clr = EmpiricalCLR(len(rejectsByQueue[k]), len(rejectsByQueue[k])+len(completes))
+		metricsListByQueue[k].LastDeparture = completes[len(completes)-1].Departure
+		metricsListByQueue[k].CLR = EmpiricalCLR(len(rejectsByQueue[k]), len(rejectsByQueue[k])+len(completes))
 	}
 	ch <- metricsListByQueue
 	return
@@ -213,7 +213,7 @@ func PrintMetricsListQueueMapCPUIO(metricsListByQueue map[int]SimMetricsList) {
 	sort.Ints(keys)
 
 	for _, k := range keys {
-		maxDeparture = math.Max(metricsListByQueue[0][len(metricsListByQueue[k])-1].lastDeparture, maxDeparture)
+		maxDeparture = math.Max(metricsListByQueue[0][len(metricsListByQueue[k])-1].LastDeparture, maxDeparture)
 	}
 
 	fmt.Printf("\nClock        = %.3f (last exit of CPU queue, last replication)\n", maxDeparture)

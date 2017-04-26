@@ -11,24 +11,24 @@ import (
 )
 
 type SimMetrics struct {
-	wait          float64
-	system        float64
-	lastDeparture float64
-	clr           float64
+	Wait          float64
+	System        float64
+	LastDeparture float64
+	CLR           float64
 }
 
 type SimMetricsList []SimMetrics
 
 func AverageWait(m SimMetrics) float64 {
-	return m.wait
+	return m.Wait
 }
 
 func AverageSystem(m SimMetrics) float64 {
-	return m.system
+	return m.System
 }
 
 func CLR(m SimMetrics) float64 {
-	return m.clr
+	return m.CLR
 }
 
 func MeanAndStdDev(metricsList []SimMetrics, fn func(m SimMetrics) float64) (mean float64, stdDev float64) {

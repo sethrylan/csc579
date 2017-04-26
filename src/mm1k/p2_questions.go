@@ -78,7 +78,7 @@ func P2Question4(replications int, seed int64) {
 			// Using 1 replication
 			metricsListByQueue := SimulateReplicationsCPUIO(ρ, []float64{µcpu, µio, µio, µio}, []int{kcpu, kio, kio, kio}, C, 1, discard, seed)
 			for i := range []int{1, 2, 3} {
-				minimumClrForIOQueues = math.Min(metricsListByQueue[i][0].clr, minimumClrForIOQueues)
+				minimumClrForIOQueues = math.Min(metricsListByQueue[i][0].CLR, minimumClrForIOQueues)
 			}
 			fmt.Printf("minimum CLR for IO Queues = %f ", minimumClrForIOQueues)
 		}

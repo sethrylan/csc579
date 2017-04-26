@@ -18,6 +18,7 @@ type Customer struct {
 	Position         int     // position of this customer in the queue at time of arrival
 	QueueAtDeparture int     // number of customers in queue at time of departure
 	PriorityQueue    int     // the number of priority queue that the customer occupies
+	Server           int     // id of the server that served this customer
 }
 
 // ByID implements sort.Interface for []Customer
@@ -124,11 +125,11 @@ func replication(wg *sync.WaitGroup, i int, λ float64, µ float64, queue Queue,
 
 	metricsListByQueue := make(SimMetricsList, len(completesByQueue))
 	for k, completes := range completesByQueue {
-		metricsListByQueue[k].wait = Mean(completes, Wait)
-		metricsListByQueue[k].system = Mean(completes, System)
+		metricsListByQueue[k].Wait = Mean(completes, Wait)
+		metricsListByQueue[k].System = Mean(completes, System)
 		sort.Sort(byDeparture(completes))
-		metricsListByQueue[k].lastDeparture = completes[len(completes)-1].Departure
-		metricsListByQueue[k].clr = EmpiricalCLR(len(rejectsByQueue[k]), len(rejectsByQueue[k])+len(completes))
+		metricsListByQueue[k].LastDeparture = completes[len(completes)-1].Departure
+		metricsListByQueue[k].CLR = EmpiricalCLR(len(rejectsByQueue[k]), len(rejectsByQueue[k])+len(completes))
 	}
 	ch <- metricsListByQueue
 	return
@@ -217,6 +218,10 @@ func logCustomer(c Customer) {
 	log.Printf("Customer %02d (%02d) | Arrival, Service, [Start, Departure] = %.3f, %.3f, [%.3f, %.3f]\n", c.ID, c.Position, c.Arrival, c.Service, c.Start, c.Departure)
 }
 
+func LogCustomer(c Customer) {
+	logCustomer(c)
+}
+
 func PrintMetricsListQueueMap(metricsListByQueue map[int]SimMetricsList) {
 	var keys []int
 	var sampleMean, sampleStdDev float64
@@ -228,7 +233,7 @@ func PrintMetricsListQueueMap(metricsListByQueue map[int]SimMetricsList) {
 	sort.Ints(keys)
 
 	for _, k := range keys {
-		maxDeparture = math.Max(metricsListByQueue[k][len(metricsListByQueue[k])-1].lastDeparture, maxDeparture)
+		maxDeparture = math.Max(metricsListByQueue[k][len(metricsListByQueue[k])-1].LastDeparture, maxDeparture)
 	}
 
 	fmt.Printf("\nClock        = %.3f (all queues, last replication)\n", maxDeparture)
