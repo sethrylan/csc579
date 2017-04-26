@@ -5,29 +5,37 @@ import (
 	"sort"
 )
 
-type Ring struct {
-	arr  []float64
-	back int
+type InfiniteQueue struct {
+	qType int // 0 - FIFO; 1 - SJF
+	arr   []float64
+	back  int
 }
 
-func NewRing(c int) (q Ring) {
-	q.arr = make([]float64, c)
+func NewInfiniteQueue(queueType int) (q InfiniteQueue) {
+	q.arr = make([]float64, 10000000)
+	q.qType = queueType
 	return
 }
 
-func (q Ring) Enqueue(arriveAt, serverAvailableAt float64) (t1 float64, sid int) {
-	if arriveAt < serverAvailableAt { // If arrival is before next available service time
-		t1 = serverAvailableAt // then queue job for next service time
-	} else { // otherwise
-		t1 = arriveAt // queue the job for the arrival time
+func (q InfiniteQueue) Enqueue(arriveAt, serverAvailableAt float64) (t1 float64, sid int) {
+	switch q.qType {
+	case 0: // FIFO
+		if arriveAt < serverAvailableAt { // If arrival is before next available service time
+			t1 = serverAvailableAt // then queue job for next service time
+		} else { // otherwise
+			t1 = arriveAt // queue the job for the arrival time
+		}
+		q.arr[q.back] = t1
+		sid = q.back
+		q.back++
+	case 1: // SJF
+	default:
+		panic("queue type not implementated")
 	}
-	q.arr[q.back] = t1
-	sid = q.back
-	q.back++
 	return
 }
 
-func (q Ring) Next() float64 {
+func (q InfiniteQueue) Next() float64 {
 	return q.arr[q.back]
 }
 

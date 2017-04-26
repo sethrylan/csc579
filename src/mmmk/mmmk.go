@@ -9,11 +9,11 @@ import (
 )
 
 type Queuer interface {
-	Enqueue(arriveAt float64, serverAvailableAt float64) (serveAt float64, seatID int)
+	Enqueue(arriveAt float64, serverAvailableAt float64) (serveAt float64, position int)
 }
 
 type Server interface {
-	Serve(startAt float64) (departAt float64, serverID int)
+	Serve(startAt float64) (completeAt float64, serverID int)
 }
 
 type Nexter interface {
@@ -30,10 +30,10 @@ type Service interface {
 	Nexter
 }
 
-func Run(a mm1k.Distribution, q Queue, s Service) (rejs, deps <-chan mm1k.Customer) {
-	rej := make(chan mm1k.Customer) // Unbuffered channels ensure deterministic simulation
-	dep := make(chan mm1k.Customer) //
-	var clock float64               // master clock
+func Run(a mm1k.Distribution, q Queue, s Service) (rejects, completes <-chan mm1k.Customer) {
+	rejected := make(chan mm1k.Customer)  // Unbuffered channels ensure deterministic simulation
+	completed := make(chan mm1k.Customer) //
+	var clock float64                     // master clock
 
 	go func() {
 		var t0 float64           // time of next arrival
@@ -54,7 +54,7 @@ func Run(a mm1k.Distribution, q Queue, s Service) (rejs, deps <-chan mm1k.Custom
 			chs = s.Next()
 			// served from t1 to t2 by server
 
-			dep <- mm1k.Customer{
+			completed <- mm1k.Customer{
 				ID:        id,
 				Arrival:   t0,
 				Service:   t2 - t1,
@@ -68,14 +68,14 @@ func Run(a mm1k.Distribution, q Queue, s Service) (rejs, deps <-chan mm1k.Custom
 		}
 	}()
 
-	rejs = rej
-	deps = dep
+	rejects = rejected
+	completes = completed
 	return
 }
 
 func SimulateReplicationsMMMK(λ float64, queueType int, numServers int, µ float64, C int, replications int, seed int64) mm1k.SimMetricsList {
 	metricsChannel := make(chan mm1k.SimMetrics, replications)
-	metricsList := make([]mm1k.SimMetrics, replications)
+	metricsList := make([]mm1k.SimMetrics, 0)
 	var wg sync.WaitGroup
 	for i := 0; i < replications; i++ {
 		wg.Add(1)
@@ -93,7 +93,7 @@ func SimulateReplicationsMMMK(λ float64, queueType int, numServers int, µ floa
 
 func SimulateReplicationsMGMK(λ float64, queueType int, numServers int, α float64, k int, p int, C int, replications int, seed int64) mm1k.SimMetricsList {
 	metricsChannel := make(chan mm1k.SimMetrics, replications)
-	metricsList := make([]mm1k.SimMetrics, replications)
+	metricsList := make([]mm1k.SimMetrics, 0)
 	var wg sync.WaitGroup
 	for i := 0; i < replications; i++ {
 		wg.Add(1)
@@ -112,7 +112,7 @@ func SimulateReplicationsMGMK(λ float64, queueType int, numServers int, α floa
 func replication(wg *sync.WaitGroup, i int, λ float64, queueType int, server Service, C int, seed int64, ch chan<- mm1k.SimMetrics) {
 	defer wg.Done()
 	defer fmt.Printf(".")
-	_, completes := Simulate(λ, server, C, seed)
+	_, completes := Simulate(λ, queueType, server, C, seed)
 
 	var metrics mm1k.SimMetrics
 	metrics.Wait = mm1k.Mean(completes, mm1k.Wait)
@@ -125,12 +125,12 @@ func replication(wg *sync.WaitGroup, i int, λ float64, queueType int, server Se
 }
 
 // Simulate will terminate once C customers have completed.
-func Simulate(λ float64, server Service, C int, seed int64) (rejects []mm1k.Customer, completes []mm1k.Customer) {
+func Simulate(λ float64, queueType int, server Service, C int, seed int64) (rejects []mm1k.Customer, completes []mm1k.Customer) {
 	var customer mm1k.Customer
 	var rejected, completed <-chan mm1k.Customer
 	rejected, completed = Run(
 		mm1k.NewExpDistribution(λ, seed),
-		NewRing(1000000),
+		NewInfiniteQueue(queueType),
 		server,
 	)
 	for len(completes) < C {
@@ -149,6 +149,7 @@ func Simulate(λ float64, server Service, C int, seed int64) (rejects []mm1k.Cus
 func PrintMetricsList(metricsList mm1k.SimMetricsList) {
 	var maxDeparture, sampleMean, sampleStdDev float64
 	for _, metrics := range metricsList {
+		// fmt.Printf("metrics = %v\n", metrics)
 		maxDeparture = math.Max(metrics.LastDeparture, maxDeparture)
 	}
 	fmt.Printf("\nClock     = %.3f (max of all replications)\n", maxDeparture)
@@ -159,6 +160,4 @@ func PrintMetricsList(metricsList mm1k.SimMetricsList) {
 	sampleMean, sampleStdDev = metricsList.MeanAndStdDev(mm1k.AverageSystem)
 	fmt.Printf("S̄ystem    = %.3f±%.3f\n", sampleMean, sampleStdDev*2) // Print 95% confidence interval
 
-	sampleMean, sampleStdDev = metricsList.MeanAndStdDev(mm1k.CLR)
-	fmt.Printf("CLR       = %.3f±%.3f\n", sampleMean, sampleStdDev*2) // Print 95% confidence interval
 }
