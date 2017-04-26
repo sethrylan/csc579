@@ -6,17 +6,19 @@ import (
 	"io/ioutil"
 	"log"
 	"mm1k"
+	"mmmk"
 	"os"
 	"sort"
 	"strconv"
 )
 
-var λ, µ, µcpu, µio float64
-var kcpu, kio, c, l, m int
+var λ, µ, µcpu, µio, α float64
+var k, kcpu, kio, c, l, m, p int
 
 const seed int64 = 42
 const discard int = 1000
 const replications int = 30
+const p3 = true
 
 const usageMsg string = "λ K C L\n" +
 	"λ = distribution of interarrival times\n" +
@@ -26,10 +28,21 @@ const usageMsg string = "λ K C L\n" +
 	"L = 0–M/M/1 system, 1–CPU with I/O disks\n" +
 	"M = 1–FCFS, 2–LCFS-NP, 3–SJF-NP, 4–Prio-NP, 5–Prio-P"
 
+const usageMsgP3 string = "λ C L M\n" +
+	"λ = distribution of interarrival times\n" +
+	"C = customers served before the program terminates\n" +
+	"L = 0-FCFS, 1-SJF\n" +
+	"M = 0-M/M/3 system, 1-M/G/3"
+
 func init() {
 
-	if len(os.Args) < 7 {
+	if len(os.Args) < 7 && !p3 {
 		fmt.Printf("usage: %s %s\n", os.Args[0], usageMsg)
+		os.Exit(1)
+	}
+
+	if len(os.Args) < 5 && p3 {
+		fmt.Printf("usage: %s %s\n", os.Args[0], usageMsgP3)
 		os.Exit(1)
 	}
 
@@ -37,16 +50,28 @@ func init() {
 	flag.Parse()
 	args := flag.Args()
 
-	λ, _ = strconv.ParseFloat(args[0], 64)
-	kcpu, _ = strconv.Atoi(args[1])
-	kio, _ = strconv.Atoi(args[2])
-	c, _ = strconv.Atoi(args[3])
-	l, _ = strconv.Atoi(args[4])
-	m, _ = strconv.Atoi(args[5])
+	if p3 {
+		λ, _ = strconv.ParseFloat(args[0], 64)
+		c, _ = strconv.Atoi(args[1])
+		l, _ = strconv.Atoi(args[2])
+		m, _ = strconv.Atoi(args[3])
 
-	µ = 1.0
-	µcpu = 1.0
-	µio = 0.5
+		µ = float64(1) / 3000
+		α = 1.1
+		k = 332
+		p = 100000 * 100000
+	} else {
+		λ, _ = strconv.ParseFloat(args[0], 64)
+		kcpu, _ = strconv.Atoi(args[1])
+		kio, _ = strconv.Atoi(args[2])
+		c, _ = strconv.Atoi(args[3])
+		l, _ = strconv.Atoi(args[4])
+		m, _ = strconv.Atoi(args[5])
+
+		µ = 1.0
+		µcpu = 1.0
+		µio = 0.5
+	}
 
 	log.SetFlags(log.Lshortfile)
 	if *debugPtr {
@@ -57,17 +82,25 @@ func init() {
 }
 
 func main() {
-	switch l {
-	case 0:
+	if p3 {
 		if c <= discard {
 			fmt.Printf("WARNING: first %d events are discarded in metric calculations\n", discard)
 		}
-		mm1kSimulationWithReplication(seed)
-	case 1:
-		cpuSimulationWithReplication(seed)
-	default:
-		fmt.Printf("usage: %s %s\n", os.Args[0], usageMsg)
-		os.Exit(1)
+		mgmkSimulationWithReplication(seed)
+
+	} else {
+		switch l {
+		case 0:
+			if c <= discard {
+				fmt.Printf("WARNING: first %d events are discarded in metric calculations\n", discard)
+			}
+			mm1kSimulationWithReplication(seed)
+		case 1:
+			cpuSimulationWithReplication(seed)
+		default:
+			fmt.Printf("usage: %s %s\n", os.Args[0], usageMsg)
+			os.Exit(1)
+		}
 	}
 
 	// mm1k.P2Question1(replications, seed)
@@ -158,4 +191,27 @@ func mm1kSimulation(seed int64) {
 		}
 	}
 
+}
+
+func mgmkSimulationWithReplication(seed int64) {
+	// var rejects, completes []mm1k.Customer
+	fmt.Printf("======= Running m/m/1/k Simulation =======\n")
+	if m > 1 || m < 0 {
+		fmt.Printf("usage: %s %s\n", os.Args[0], usageMsgP3)
+		os.Exit(1)
+	}
+	fmt.Printf("λ =     %.4f\n", λ)
+	fmt.Printf("C =     %d\n", c)
+	fmt.Printf("L =     %s\n", mm1k.GetFunctionName(mm1k.QueueMakers[l]))
+
+	var metricsList mm1k.SimMetricsList
+	if m == 0 { // MMMK (exponential service times)
+		fmt.Printf("M =     M/M/3\n")
+		metricsList = mmmk.SimulateReplicationsMMMK(λ, l, 3, µ, c, replications, seed)
+		mmmk.PrintMetricsList(metricsList)
+	} else { // MMGK (pareto service times)
+		fmt.Printf("M =     M/G/3\n")
+		metricsList = mmmk.SimulateReplicationsMGMK(λ, l, 3, α, k, p, c, replications, seed)
+		mmmk.PrintMetricsList(metricsList)
+	}
 }
