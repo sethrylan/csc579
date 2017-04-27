@@ -173,9 +173,19 @@ func mgmkSimulationWithReplication(seed int64) {
 		fmt.Printf("usage: %s %s\n", os.Args[0], usageMsgP3)
 		os.Exit(1)
 	}
+	var lstring string
+	switch l {
+	case 0:
+		lstring = "FIFO"
+	case 1:
+		lstring = "SJF"
+	default:
+		fmt.Printf("usage: %s %s\n", os.Args[0], usageMsgP3)
+		os.Exit(1)
+	}
 	fmt.Printf("λ =     %.4f\n", λ)
 	fmt.Printf("C =     %d\n", c)
-	fmt.Printf("L =     %s\n", mm1k.GetFunctionName(mm1k.QueueMakers[l]))
+	fmt.Printf("L =     %s\n", lstring)
 
 	var metricsList mm1k.SimMetricsList
 	if m == 0 { // MMMK (exponential service times)
