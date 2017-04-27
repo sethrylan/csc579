@@ -33,3 +33,6 @@ p1:
 
 p2:
 	tar czvf p2.tar.gz --exclude=".DS_Store" Makefile readme.md ./src ./test ./p2/paper/
+
+p3:
+	tar czvf p3.tar.gz --exclude=".DS_Store" Makefile readme.md ./src ./test ./p3/paper/
