@@ -143,32 +143,6 @@ func cpuSimulationWithReplication(seed int64) {
 	mm1k.PrintMetricsListQueueMapCPUIO(metricsListByQueue)
 }
 
-// P2 implementation
-// func cpuSimulation(seed int64) {
-// 	fmt.Printf("======= Running CPU/IO Simulation =======\n")
-// 	fmt.Printf("λ =     %.3f\n", λ)
-// 	fmt.Printf("µcpu =  %.3f\n", µcpu)
-// 	fmt.Printf("µio =   %.3f\n", µio)
-// 	fmt.Printf("Kcpu =  %d\n", kcpu)
-// 	fmt.Printf("Kio =   %d\n", kio)
-// 	fmt.Printf("C =     %d\n", c)
-// 	fmt.Printf("L =     %d\n", l)
-//
-// 	rejects, completes, exits := mm1k.SimulateCPUIO(λ, []float64{µcpu, µio, µio, µio}, []mm1k.Queue{mm1k.NewFIFO(kcpu), mm1k.NewFIFO(kio), mm1k.NewFIFO(kio), mm1k.NewFIFO(kio)}, c, seed)
-// 	sorted := append(rejects, exits...)
-// 	sorted = append(sorted, completes...)
-// 	sort.Sort(mm1k.ByID(sorted))
-// 	totalEvents := sorted[len(sorted)-1].ID + 1
-// 	sampleServiceTimeMean := mm1k.Mean(completes, mm1k.Service)
-//
-// 	fmt.Printf("Master clock =                   %.3f\n", completes[len(completes)-1].Departure)
-// 	fmt.Printf("CLR (Analytical) =               %.3f\n", mm1k.AnalyticalCLR(λ, kcpu))
-// 	fmt.Printf("CLR (Empirical; X/N = %d/%d) =   %.3f\n", len(rejects), totalEvents, mm1k.EmpiricalCLR(len(rejects), totalEvents))
-// 	fmt.Printf("Mean Service Time (S̄) =          %.3f\n", sampleServiceTimeMean)
-// 	fmt.Printf("Mean Wait Time (W̄) =             %.3f\n", mm1k.Mean(completes, mm1k.Wait))
-// 	fmt.Printf("Analytical Wait Time (W̄) =       %.3f\n", mm1k.AnalyticalWaitTime(λ, kcpu))
-// }
-
 // P1 implementation
 func mm1kSimulation(seed int64) {
 	rejects, completes := mm1k.Simulate(λ, µ, mm1k.QueueMakers[m-1](kcpu), c, seed)
@@ -194,7 +168,6 @@ func mm1kSimulation(seed int64) {
 }
 
 func mgmkSimulationWithReplication(seed int64) {
-	// var rejects, completes []mm1k.Customer
 	fmt.Printf("======= Running m/m/1/k Simulation =======\n")
 	if m > 1 || m < 0 {
 		fmt.Printf("usage: %s %s\n", os.Args[0], usageMsgP3)
@@ -214,4 +187,5 @@ func mgmkSimulationWithReplication(seed int64) {
 		metricsList = mmmk.SimulateReplicationsMGMK(λ, l, 3, α, k, p, c, replications, seed)
 		mmmk.PrintMetricsList(metricsList)
 	}
+
 }

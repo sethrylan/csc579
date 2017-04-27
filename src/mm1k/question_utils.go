@@ -47,18 +47,7 @@ func MeanAndStdDev(metricsList []SimMetrics, fn func(m SimMetrics) float64) (mea
 }
 
 func (metricsList SimMetricsList) MeanAndStdDev(fn func(m SimMetrics) float64) (mean float64, stdDev float64) {
-	n := len(metricsList)
-	if n == 0 {
-		return 0.0, 0.0
-	}
-	sum, squareSum := 0.0, 0.0
-	for _, m := range metricsList {
-		sum += fn(m)
-		squareSum += math.Pow(fn(m), 2)
-	}
-	mean = sum / float64(n)
-	variance := squareSum/float64(n) - mean*mean
-	return mean, math.Sqrt(variance)
+	return MeanAndStdDev(metricsList, fn)
 }
 
 // AnalyticalCLR returns the Customer Loss Rate as a function of ρ and K
@@ -90,6 +79,21 @@ func AnalyticalWaitTime(ρ float64, K int) float64 {
 	L := ρ * (1 - (k+1)*math.Pow(ρ, k) + k*math.Pow(ρ, k+1)) * p0 / math.Pow((1-ρ), 2)
 	W := L / effLambda
 	return W
+}
+
+func MeanAndStd(customers []Customer, fn field) (mean float64, stdDev float64) {
+	n := len(customers)
+	if n == 0 {
+		return 0.0, 0.0
+	}
+	sum, squareSum := 0.0, 0.0
+	for _, m := range customers {
+		sum += fn(m)
+		squareSum += math.Pow(fn(m), 2)
+	}
+	mean = sum / float64(n)
+	variance := squareSum/float64(n) - mean*mean
+	return mean, math.Sqrt(variance)
 }
 
 // Mean calculates the mean for field fn in a list of customers

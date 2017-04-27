@@ -42,6 +42,13 @@ func (a ByDeparture) Len() int           { return len(a) }
 func (a ByDeparture) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByDeparture) Less(i, j int) bool { return a[i].Departure < a[j].Departure }
 
+// ByWait implements sort.Interface for []Customer
+type ByWait []Customer
+
+func (a ByWait) Len() int           { return len(a) }
+func (a ByWait) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByWait) Less(i, j int) bool { return Wait(a[i]) < Wait(a[j]) }
+
 type field func(c Customer) float64
 
 // Service is a field for sorting customer.

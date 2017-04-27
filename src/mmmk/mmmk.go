@@ -9,73 +9,74 @@ import (
 )
 
 type Queuer interface {
-	Enqueue(arriveAt, serviceTime, serverAvailableAt float64) job
+	Enqueue(customer mm1k.Customer)
+	Dequeue() mm1k.Customer
+	Empty() bool
 }
 
 type Server interface {
-	Serve(j job) (completeAt float64, serverID int)
+	Add(customer mm1k.Customer)
+	Dequeue() mm1k.Customer
+	NextCompletion() mm1k.Customer
 	Get() float64 // return RV from service distribution
-}
-
-type Nexter interface {
-	Next() (nextJob job)
+	isFull() bool
 }
 
 type Queue interface {
 	Queuer
-	Nexter
 }
 
 type Service interface {
 	Server
-	Nexter
 }
 
-func Run(a mm1k.Distribution, q Queue, s Service) (rejects, completes <-chan mm1k.Customer) {
+func Run(arrivalDistribution mm1k.Distribution, q Queue, s Service) (rejects, completes <-chan mm1k.Customer) {
 	rejected := make(chan mm1k.Customer)  // Unbuffered channels ensure deterministic simulation
 	completed := make(chan mm1k.Customer) //
+	var clock float64                     // master clock
 
 	go func() {
-		var t0 float64           // time of next arrival
-		var t1 job               // job of next start
-		var t2 float64           // time of next completion (∞ for no schedule Customer)
-		var id int               // Incremented Customer ID
-		var chs job              // time of next available service
-		var position, server int // position and server id
-		for {
-			t0 += a.Get()
-			// no rejections
-
-			q.Enqueue(t0, s.Get(), chs.serveAt)
-			t1 = q.Next()
-			// waited from t0 to t1
-
-			t2, server = s.Serve(t1)
-			chs = s.Next()
-			// served from t1 to t2 by server
-			mm1k.PrintCustomer(mm1k.Customer{
-				ID:        id,
-				Arrival:   t0,
-				Service:   t1.serviceTime,
-				Start:     t1.serveAt,
-				Departure: t2,
-				Position:  position,
-				Server:    server,
-			})
-
-			completed <- mm1k.Customer{
-				ID:        id,
-				Arrival:   t0,
-				Service:   t1.serviceTime,
-				Start:     t1.serveAt,
-				Departure: t2,
-				Position:  position,
-				Server:    server,
-			} // departed
-			id++
+		var t1 = arrivalDistribution.Get() // time of next arrival
+		var t2 = math.Inf(1)               // time of next completion (∞ for no schedule Customer)
+		var id int                         // Incremented Customer ID
+		for {                              // Do forever
+			if t1 < t2 { // If next arrival is before next completion -> Event: Arrival
+				clock = t1 // Set clock to time of next arrival.
+				// never reject
+				q.Enqueue(
+					mm1k.Customer{
+						ID:      id,
+						Arrival: t1,
+						Service: s.Get(),
+					})
+				id++
+				if !s.isFull() {
+					c := q.Dequeue()                  // Dequeue from queue
+					c.Start = clock                   // set start to current time
+					c.Departure = c.Start + c.Service // calculate depart time
+					s.Add(c)                          // Add to server
+				}
+				t1 = clock + arrivalDistribution.Get() // Set t1 to time of next arrival.
+				t2 = s.NextCompletion().Departure      // then set t2 to time of next completion.
+			} else { // If next arrival is after next completion -> Event: Departure
+				if !math.IsInf(t2, 1) { // if next completion exists
+					clock = t2                                             // Set time to time of next completion.
+					customer := s.Dequeue()                                // Remove customer from queue
+					customer.Departure = customer.Start + customer.Service // Set completion time
+					// customer.Start = t2 - customer.Service // and start time
+					// mm1k.PrintCustomer(customer)
+					completed <- customer // and add the customer to the completed channel
+					if !q.Empty() {
+						c := q.Dequeue()
+						c.Start = t2
+						c.Departure = c.Start + c.Service
+						s.Add(c)
+					}
+				}
+				t2 = s.NextCompletion().Departure
+			}
 		}
 	}()
-
 	rejects = rejected
 	completes = completed
 	return
@@ -167,12 +168,14 @@ func PrintMetricsList(metricsList mm1k.SimMetricsList) {
 		// fmt.Printf("metrics = %v\n", metrics)
 		maxDeparture = math.Max(metrics.LastDeparture, maxDeparture)
 	}
-	fmt.Printf("\nClock     = %.3f (max of all replications)\n", maxDeparture)
+	fmt.Printf("\nClock     = %.0f (max of all replications)\n", maxDeparture)
 
 	sampleMean, sampleStdDev = metricsList.MeanAndStdDev(mm1k.AverageWait)
-	fmt.Printf("W̄ait      = %.3f±%.3f\n", sampleMean, sampleStdDev*2) // Print 95% confidence interval
+	fmt.Printf("W̄ait      = %.0f±%.0f\n", sampleMean, sampleStdDev*2) // Print 95% confidence interval
 
 	sampleMean, sampleStdDev = metricsList.MeanAndStdDev(mm1k.AverageSystem)
-	fmt.Printf("S̄ystem    = %.3f±%.3f\n", sampleMean, sampleStdDev*2) // Print 95% confidence interval
+	fmt.Printf("S̄ystem    = %.0f±%.0f\n", sampleMean, sampleStdDev*2) // Print 95% confidence interval
+
+	// fmt.Printf("  %.0f) +- (0.0, %.0f)\n", sampleMean, sampleStdDev*2) // Print 95% confidence interval
 
 }
